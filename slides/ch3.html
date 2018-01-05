@@ -1,0 +1,856 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Deep Learning CH3</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				
+				<section>
+					<div style = "height:800px;width:450px;float:left;">
+						<img src="./imgs/dp_back.jpg" />
+					</div>
+					<div>
+						<h3>第3章 概率与信息论</h3>
+
+						<ul style="font-size: 30px;">
+							<li>为什么要使用概率</li>
+							<li>随机变量</li>
+							<li>概率分布</li>
+							<li>边缘概率</li>
+							<li>条件概率</li>
+							<li>条件概率的链式法则</li>
+							<li>独立性和条件独立性</li>
+							<li>期望、方差和协方差</li>
+							<li>常用概率分布</li>
+							<li>常用函数的有用性质</li>
+							<li>贝叶斯规则</li>
+							<li>连续型变量的技术细节</li>
+							<li>信息论</li>
+							<li>结构化概率模型</li>
+						</ul>
+					</div>
+				</section>
+
+				
+				<section>
+					<section>
+						<h2>3.1 为什么要使用概率？</h2>
+					</section>
+					
+		
+					<section>
+						<h2>不确定性</h2>
+						<div align="left">
+							<ul>
+								<li>
+									被建模系统内在的随机性，量子力学
+								</li>
+								<li>
+									不完全观测，观察者角度未知
+								</li>
+								<li>
+									不完全建模，离散化
+								</li>
+							</ul>
+						</div>				
+					</section>
+
+					<section>
+						<p align="left">模糊规则有时比确定规则更实用</p>
+						<div align="left">
+							<ul>
+								<li>
+									多数鸟会飞
+								</li>
+								<li>
+									除了……;……;……;之外的鸟会飞
+								</li>
+							</ul>
+						</div>
+						<p align="left">需要表示不确定性的方法</p>
+						<div align="left">
+							<ul>
+								<li>
+									概率论
+								</li>
+								<ul>
+									<li>
+										频率派概率：重复事件，大量实验统计出特定结果所占的比例
+									</li>
+									<li>
+										贝叶斯概率：如根据症状推断病情，推断冰山融化的概率等无法大量重复的事件，频率更代表事情的置信度
+									</li>
+								</ul>
+								
+							</ul>
+						</div>			
+					</section>
+		
+				</section>
+
+				<section>
+					<section>
+						<h2>3.2 随机变量</h2>
+					</section>
+
+					<section>
+						<p align="left">随机变量</p>
+						<div align="left">
+							<ul>
+								<li>
+									$\mathbf{x}$, 随机取不同值$\boldsymbol{\mathit{x}}$的变量
+								</li>
+								<li>
+									离散或者连续
+								</li>	
+							</ul>
+						</div>
+					</section>
+						
+										
+				</section>
+
+				<section>
+					<section>
+						<h2>3.3 概率分布</h2>
+						<p>描述随机变量在每一个可能的状态的可能性大小</p>
+					</section>
+
+					<section>
+						<h3>3.3.1 离散型变量和概率质量函数</h3>
+						
+						<div align="left">
+							<ul>
+								<li>
+									概率质量函数（probability mass function, PMF）:$P(X=x)$, $\mathrm{x}\sim P(\mathrm{x})$
+								</li>
+								<li>
+									联合概率分布（joint probability distribution）：$P(\mathrm{x} = x, \mathrm{y} = y)$
+								</li>
+								<li>
+									P是x的PMF必须满足以下条件：
+									<ul>
+										<li>
+											P的定义域是x所有状态的集合
+										</li>
+										<li>
+											$\forall x \in \mathrm{x}, 0\le P(x)\le 1.$
+										</li>
+										<li>
+											$\sum_{x \in \mathrm{x}} P(x) = 1$，归一化(Normalized)
+										</li>
+										
+										
+									</ul>
+								</li>	
+							</ul>
+						</div>
+					</section>
+						
+
+					<section>
+						<h3>3.3.2 连续型变量和概率密度函数</h3>
+						
+						<div align="left">
+							<ul>
+								<li>
+									概率密度函数（probability density function, PDF）：$p$
+								</li>
+								<li>
+									p是x的PDF必须满足以下条件：
+									<ul>
+										<li>
+											P的定义域是x所有状态的集合
+										</li>
+										<li>
+											$\forall x \in \mathrm{x}, p(x)\ge 0.$注意，不要求$p(x)\le 1$
+										</li>
+										<li>
+											\item $\int p(x) dx = 1.$
+										</li>
+									</ul>
+								</li>
+								<li>
+									$x$落在区间$[a, b]$的概率是$\int_{[a,b]} p(x)dx$
+								</li>	
+							</ul>
+						</div>
+					</section>
+										
+				</section>
+
+				<section>
+					<section>
+						<h2>3.4 边缘概率</h2>
+					</section>
+
+					<section>
+						<p align="left">边缘概率分布(marginal probability distribution)</p>
+						<div align="left">
+							<ul>
+								<li>
+									知道联合概率分布，求子集上的概率分布
+								</li>
+								<li>
+									$P(\mathrm{x}, \mathrm{y})$
+								</li>
+								<li>
+									$\forall x \in \mathrm{x}, P(\mathrm{x} = x) = \sum_y P(\mathrm{x} = x, \mathrm{y} = y).$
+								</li>
+								<li>
+									$p(x) = \int p(x, y)dy.$
+								</li>	
+							</ul>
+						</div>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>3.5 条件概率</h2>
+					</section>
+
+					<section>
+						<p align="left">条件概率</p>
+						<div align="left">
+							<ul>
+								<li>
+									某些事件发生后，其他事件发生的概率
+								</li>
+								<li>
+									$P(\mathrm{y} = y\mid \mathrm{x} = x) = \frac{P(\mathrm{y} = y, \mathrm{x} = x)}{P(\mathrm{x} = x)}$
+								</li>	
+							</ul>
+						</div>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>3.6 条件概率的链式法则</h2>
+					</section>
+
+					<section>
+						<p align="left">链式法则、乘法法则</p>
+						<div align="left">
+							<ul>
+								<li>
+									$P(\mathrm{x}^{(1)}, \ldots, \mathrm{x}^{(n)}) = P(\mathrm{x}^{(1)}) \Pi_{i=2}^n P(\mathrm{x}^{(i)} \mid \mathrm{x}^{(1)}, \ldots, \mathrm{x}^{(i-1)})$
+								</li>
+								
+								<li>
+									\begin{eqnarray*}
+										P(\mathrm{a}, \mathrm{b}, \mathrm{c}) &=& P(\mathrm{a} \mid \mathrm{b}, \mathrm{c}) P(\mathrm{b}, \mathrm{c})\\
+										P(\mathrm{b}, \mathrm{c}) &=& P(\mathrm{b} \mid \mathrm{c}) P(\mathrm{c})\\
+										P(\mathrm{a}, \mathrm{b}, \mathrm{c}) &=& P(\mathrm{a} \mid \mathrm{b}, \mathrm{c}) P(\mathrm{b} \mid \mathrm{c}) P(\mathrm{c}).
+									\end{eqnarray*}	
+								</li>
+								
+							</ul>
+						</div>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>3.7 独立性和条件独立性</h2>
+					</section>
+
+					<section>
+						<p align="left">链式法则、乘法法则</p>
+						<div align="left">
+							<ul>
+								<li>
+									$\mathrm{x}$和$\mathrm{y}$相互独立（independent）
+								</li>
+								<p> $\forall x \in \mathrm{x}, y \in \mathrm{y}, p(\mathrm{x} = x, \mathrm{y} = y) = p(\mathrm{x} = x)p(\mathrm{y} = y)$</p>
+								<li>
+									$\mathrm{x}$和$\mathrm{y}$在给定z时条件独立（conditional independent）
+								</li>
+								<p> $\forall x \in \mathrm{x}, y \in \mathrm{y}, z \in \mathrm{z}$</p>
+								<p>$p( \mathrm{x}=x, \mathrm{y}=y \mid \mathrm{z}=z)$</p>
+								<p>$=p(\mathrm{x} = x \mid \mathrm{z} = z) p(\mathrm{y} = y \mid \mathrm{z} = z)$</p>
+								
+							</ul>
+						</div>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>3.8 期望、方差和协方差</h2>
+					</section>
+
+					<section>
+						<p align="left">期望（Expectation）</p>
+						<div align="left">
+							<ul>
+								<li>
+									函数$f(x)$关于某分布$P(\mathrm{x})$的期望，当$x$由$P$产生，$f$作用于$x$时，$f(x)$的平均值
+								</li>
+								
+								<li>
+									离散型，$\mathbb{E}_{\mathrm{x} \sim P}[f(x)] = \sum_x P(x)f(x)$
+								</li>
+								<li>
+									连续型，$\mathbb{E}_{\mathrm{x} \sim p}[f(x)] = \int p(x)f(x)dx$
+								</li>
+								<li>
+									线性，$\mathbb{E}_{\mathrm{x}}[\alpha f(x) + \beta g(x)] = \alpha \mathbb{E}_{\mathrm{x}}[f(x)] + \beta \mathbb{E}_{\mathrm{x}}[g(x)]$
+								</li>
+							</ul>
+						</div>
+					</section>
+
+					<section>
+						<p align="left">方差（Variance）</p>
+						<div align="left">
+							<ul>
+								<li>
+									衡量对x依据概率分布进行采样时，呈现的差异
+								</li>
+								
+								<li>
+									$\text{Var}(f(x)) = \mathbb{E} \left [(f(x) - \mathbb{E}[f(x)])^2 \right]$
+								</li>
+								<li>
+									标准差（Standard Deviation），方差的平方根
+								</li>
+								<li>
+									协方差（Covariance），衡量两个变量相关性
+								</li>
+								<p>$\text{Cov}(f(x), g(y)) = \mathbb{E}[ ( f(x)-\mathbb{E}[f(x)] )( g(y)-\mathbb{E}[g(y)] ) ]$</p>
+							</ul>
+						</div>
+					</section>
+
+					<section>
+						<div align="left">
+							<ul>
+								<li>
+									相关性系数（Correlation）, 归一化的协方差
+								</li>
+								$\rho _{X,Y}=\mathrm {corr} (X,Y)={\mathrm {cov} (X,Y) \over \sigma _{X}\sigma _{Y}}={E[(X-\mu _{X})(Y-\mu _{Y})] \over \sigma _{X}\sigma _{Y}}$
+								<li>
+									协方差矩阵
+								</li>
+								<p>$\text{Cov}(\mathbf{x})_{i,j} = \text{Cov}(\mathrm{x}_i, \mathrm{x}_j)$</p>
+								<p>$\text{Cov}(\mathrm{x}_i, \mathrm{x}_i) = \text{Var}(\mathrm{x}_i)$</p>
+							</ul>
+						</div>
+					</section>
+
+				</section>
+
+				<section>
+					<section>
+						<h2>3.9 常用概率分布</h2>
+					</section>
+
+					<section>
+						<p align="left">伯努利(Bernoulli)分布</p>
+						<div align="left">
+							<ul>
+								<li>
+									二值随机变量的分布，（掷硬币）
+								</li>
+								<li>
+									参数$\phi \in [0, 1]$控制分布
+								</li>
+								<p>\begin{gather}
+										P(\mathrm{x} =1) = \phi\\
+										P(\mathrm{x} =0) = 1-\phi\\
+										P(\mathrm{x} = x) = \phi^x (1-\phi)^{1-x}\\
+										\mathbb{E}_{\mathrm{x}}[\mathrm{x}] = \phi\\
+										\text{Var}_{\mathrm{x}}(\mathrm{x}) = \phi(1-\phi)
+									\end{gather}
+								</p>
+								
+							</ul>
+						</div>
+					</section>
+
+					<section>
+						<p align="left">Categorical distribution、Multinoulli distribution</p>
+						<div align="left">
+							<ul>
+								<li>
+									k值随机变量的分布
+								</li>
+								<li>
+									$\boldsymbol{\mathit{p}} \in [0, 1]^{k-1}$
+								</li>
+								<li>
+									每个类别的概率
+								</li>
+								
+							</ul>
+						</div>
+					</section>
+
+					<section>
+						<h7>高斯(正态)分布(Gaussian(Normal) Distribution)</h7>
+						<div align="left">
+							<ul>
+								<li>
+									$\mathcal{N}(x; \mu, \sigma^2) = \sqrt{\frac{1}{2\pi \sigma^2}} \exp \left ( -\frac{1}{2\sigma^2} (x-\mu)^2 \right )$
+								</li>
+								<li>
+									$\mu \in \mathbb{R}$, $\sigma \in (0, \infty)$
+								</li>
+								<li>
+									$\mathbb{E}[\mathrm{x}] = \mu$, $\text{Var}[\mathrm{x}] = \sigma^2$
+								</li>
+							</ul>
+
+						</div>
+						<img src="./imgs/gaussian.png" width="600" height="300" align="center">
+					</section>
+
+					<section>
+						<div align="left">
+							<ul>
+								<li>
+									精度(Precision),$\beta \in (0, \infty)$
+								</li>
+								<li>
+									$\mathcal{N}(x; \mu, \beta^{-1}) = \sqrt{\frac{\beta}{2\pi}} \exp \left(  -\frac{1}{2}\beta (x-\mu)^2 \right)$
+								</li>
+							</ul>
+						</div>
+						<p align="left">不知如何选取分布时，高斯分布是合理选择</p>
+						<div align="left">
+							<ul>
+								<li>
+									中心极限定理，很多独立随机变量的和近似服从正态分布，例如，复杂系统包含的噪声
+								</li>
+								<li>
+									具有相同方差的所有概率分布中，正态分布具有最大的不确定性，加入的先验知识最少
+								</li>
+							</ul>
+						</div>
+					</section>
+
+
+					<section>
+						<p>多元高斯分布（Multivariate normal distribution）</p>
+						<div align="left">
+							<ul>
+								<li style="font-size: 30px;">
+									$\mathcal{N}(\boldsymbol{\mathit{x}}; \boldsymbol{\mu}, \boldsymbol{\Sigma}) = \sqrt{ \frac{1}{ (2\pi)^n \det(\boldsymbol{\Sigma})}}  \exp \left ( -\frac{1}{2} (\boldsymbol{\mathit{x}}-\boldsymbol{\mu})^\top \boldsymbol{\Sigma}^{-1} (\boldsymbol{\mathit{x}}- \boldsymbol{\mu}) \right)$
+								</li>
+								<li>
+									协方差矩阵，$\boldsymbol{\Sigma}$，正定对称；$\boldsymbol{\mu}$，均值向量
+								</li>
+								<li>
+									精度矩阵，$\boldsymbol{\beta}$
+								</li>
+								<li style="font-size: 30px;">
+									$\mathcal{N}(\boldsymbol{\mathit{x}}; \boldsymbol{\mu}, \boldsymbol{\beta}^{-1}) = \sqrt{ \frac{\det(\boldsymbol{\beta})}{ (2\pi)^n}}  \exp \left ( -\frac{1}{2} (\boldsymbol{\mathit{x}}-\boldsymbol{\mu})^\top \boldsymbol{\beta} (\boldsymbol{\mathit{x}}- \boldsymbol{\mu}) \right)$
+								</li>
+								<li>
+									简化协方差矩阵为对角阵；甚至各向同性的协方差矩阵，所有对角元素相同的对角阵
+								</li>
+							</ul>
+						</div>
+					</section>
+
+
+					<section>
+						<p align="left">指数分布</p>
+						<div align="left">
+							<ul>
+								<li>
+									指数分布，在x=0处取得边界点的分布
+								</li>
+								<ul>
+									<li>
+										$p(x; \lambda) = \lambda \boldsymbol{1}_{x\ge 0} \exp(-\lambda x)$
+									</li>
+									<li>
+										指示函数, $\boldsymbol{1}_{x\ge 0}$, 使x取负数时概率为0
+									</li>
+								</ul>
+							</ul>
+						</div>
+						<img src="./imgs/Exponential_pdf.png">
+					</section>
+
+					<section>
+						<p align="left">Laplace分布</p>
+						<div align="left">
+							<ul>
+								<li>
+									Laplace分布，在$x=\mu$处取得边界点的分布
+								</li>
+								<ul>
+									<li>
+										$\text{Laplace}(x; \mu, \gamma) = \frac{1}{2\gamma} \exp \left( -\frac{|x-\mu|}{\gamma}  \right)$
+									</li>
+								</ul>								
+							</ul>
+						</div>
+						<img src="./imgs/Laplace_pdf.png">
+					</section>
+
+					<section>
+						<p align="left">Dirac分布</p>
+						<div align="left">
+							<ul>
+								<li>
+									概率分布中的所有质量都集中在一个点上
+								</li>
+								<li>
+									Dirac delta函数：$\delta(x)$
+								</li>
+								<li>
+									$\delta (x)={\begin{cases}+\infty ,&amp;x=0\\0,&amp;x\neq 0\end{cases}}$
+								</li>									
+								<li>
+									$\int _{-\infty }^{\infty }\delta (x)\,dx=1$
+								</li>
+								<li>
+									$p(x) = \delta(x-\mu)$
+								</li>						
+							</ul>
+						</div>
+					</section>
+
+					<section>
+						<img src="./imgs/Dirac_PDF.png">
+					</section>
+
+					<section>
+						<p align="left">经验分布（Empirical Distribution）</p>
+						<div align="left">
+							<ul>
+								<li>
+									概率分布中的所有质量都集中在m个点上
+								</li>
+								<li>
+									$\hat{p}(\boldsymbol{\mathit{x}}) = \frac{1}{m} \sum_{i=1}^m \delta(\boldsymbol{\mathit{x}} - \boldsymbol{\mathit{x}}^{(i)})$
+								</li>						
+							</ul>
+						</div>
+					</section>
+
+					<section>
+						<p align="left">混合分布</p>
+						<div align="left">
+							<ul>
+								<li>
+									多个概率分布组合而成，每个组件的选择服从Multinoulli分布
+								</li>
+								<li>
+									$P(\mathrm{x}) = \sum_i P(\mathrm{c} = i) P(\mathrm{x} \mid \mathrm{c} = i)$
+								</li>
+								<li>
+									实值变量的经验分布是以Dirac分布为组件的混合分布
+								</li>
+								<li>
+									混合模型引出重要概念，潜变量（Latent Variable），c
+								</li>							
+							</ul>
+						</div>
+					</section>
+
+					<section>
+						<p align="left">高斯混合模型</p>
+						<div align="left">
+							<ul>
+								<li>
+									多个高斯分布（$p(\mathbf{x} \mid \mathrm{c}= i)$）组成的概率模型
+								</li>
+								<li>
+									先验概率（Prior Probability），$\alpha_i = P(\mathrm{c} = i)$
+								</li>
+								<li>
+									后验概率（Prior Probability），$P(\mathrm{c} \mid \boldsymbol{\mathit{x}})$
+								</li>
+								<li>
+									万能近似器，逼近任何平滑的概率密度
+								</li>						
+							</ul>
+						</div>
+					</section>
+				</section>
+
+
+				<section>
+					<section>
+						<h2>3.10 常用函数的有用性质</h2>
+					</section>
+
+					<section>
+						<p align="left">logistic sigmoid函数</p>
+						<div align="left">
+							<ul>
+								<li>
+									$\sigma(x) = \frac{1}{1+\exp(-x)}$
+								</li>
+								<li>
+									值域：$(0,1)$, 可给出伯努利分布的参数$\phi$
+								</li>
+								
+								<li>
+									饱和(saturate)现象，在绝对值大处，梯度小，训练时改变少
+								</li>	
+							</ul>
+						</div>
+						<img src="./imgs/fig3_3.png" height="300">
+					</section>
+
+					<section>
+						<p align="left">softplus函数</p>
+						<div align="left">
+							<ul>
+								<li>
+									$\zeta(x) = \log(1+\exp(x))$
+								</li>
+								<li>
+									值域：$(0,\infty)$, 可给出高斯分布的$\sigma,\beta$
+								</li>
+								
+								<li>
+									$x^+ = \max(0, x)$的"软化"版
+								</li>	
+							</ul>
+						</div>
+						<img src="./imgs/fig3_4.png" height="300">
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 20px;">
+							\begin{gather}
+								\sigma(x) = \frac{\exp(x)}{\exp(x)+\exp(0)}\\
+								\frac{d}{dx} \sigma(x) = \sigma(x)(1 - \sigma(x))\\
+								1-\sigma(x) = \sigma(-x)\\
+								\log \sigma(x) = -\zeta(-x)\\
+								\frac{d}{dx} \zeta(x) = \sigma(x)\\
+								\forall x \in (0, 1), \sigma^{-1}(x) = \log \left (  \frac{x}{1-x} \right)\\
+								\forall x>0, \zeta^{-1}(x) = \log(\exp(x) - 1)\\
+								\zeta(x) = \int_{-\infty}^x \sigma(y) dy\\
+								\zeta(x) - \zeta(-x) = x
+								\label{eq:3.41}
+							\end{gather}
+						</p>						
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>3.11 贝叶斯规则</h2>
+					</section>
+
+					<section>
+						<p align="left">logistic sigmoid函数</p>
+						<div align="left">
+							<ul>
+								<li>
+									已知$P(\mathrm{y} \mid \mathrm{x})$，$P(\mathrm{x})$时计算$P(\mathrm{x} \mid \mathrm{y})$
+								</li>
+								<li>
+									$P(\mathrm{x} \mid \mathrm{y}) = \frac{P(\mathrm{x}) P(\mathrm{y} \mid \mathrm{x})}{P(\mathrm{y})}$
+								</li>
+								
+								<li>
+									$P(\mathrm{y}) = \sum_x P(\mathrm{y} \mid x) P(x)$
+								</li>	
+							</ul>
+						</div>
+						<img src="./imgs/fig3_3.png" height="300">
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>3.12 连续型变量的技术细节</h2>
+					</section>
+
+					<section>
+						<p align="left">测度论(Measure Theory)</p>
+						<div align="left">
+							<ul>
+								<li>
+									研究集合上的测度和积分的理论
+								</li>
+								<li>
+									描述适用于$\mathbb{R}^n$上的大多数点，却不适用于一些边界情况的定理
+								</li>
+								<li>
+									零测度，不再空间中占任何体积，二维空间中，线的测度为0
+								</li>
+								<li>
+									几乎处处（almost everwhere）成立的性质，除了测度为0的集合外都成立
+								</li>
+							</ul>
+						</div>
+					</section>
+
+					<section>
+						<div align="left">
+							<ul>
+								<li>
+									$\mathbf{x}$和$\mathbf{y}$满足$\boldsymbol{\mathit{y}} = g(\boldsymbol{\mathit{x}})$，其中$g$是可逆的、连续可微的函数
+								</li>
+								<li>
+									$|p_y(g(x))dy| = |p_x(x)dx|$
+								</li>
+								<li>
+									$p_x(x) = p_y(g(x)) \left | \frac{\partial g(x)}{\partial x} \right |$
+								</li>
+								<li>
+									Jacobian矩阵，$J_{i, j} = \frac{\partial x_i}{\partial y_j}$
+								</li>
+								<li>
+									$p_x(\boldsymbol{\mathit{x}}) = p_y(g(\boldsymbol{\mathit{x}})) \left | \det \left ( \frac{\partial g(\boldsymbol{\mathit{x}})}{\partial \boldsymbol{\mathit{x}}} \right) \right |$
+								</li>								
+							</ul>
+						</div>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>3.13 信息论</h2>
+					</section>
+
+					<section>
+						<p align="left">量化信息</p>
+						<div align="left">
+							<ul>
+								<li>
+									非常可能发生的事件信息量少
+								</li>
+								<li>
+									低可能事件的信息量大
+								</li>
+								<li>
+									独立事件信息量可线性增加
+								</li>
+								<li>
+									事件$\mathrm{x} = x$的自信息(self-information), $I(x) = -\log P(x)$
+								</li>
+								<li>
+									香农熵（Shannon Entropy）, 对整个概率分布的不确定总量进行量化
+								</li>
+							</ul>
+						</div>
+						<p>$H(\mathrm{x}) = \mathbb{E}_{\mathrm{x} \sim P}[I(x)] = -\mathbb{E}_{\mathrm{x} \sim P}[\log P(x)]$</p>
+					</section>
+
+					<section>
+						<p align="left">KL散度(Kullback-Leibler divergence)</p>
+						<div align="left">
+							<ul>
+								<li>
+									衡量两个概率分布$P(\mathrm{x})$和$Q(\mathrm{x})$的差异
+								</li>
+								<p style="font-size: 25px;">$D_{\text{KL}}(P||Q) = \mathbb{E}_{\mathrm{x} \sim P} \left [  \log \frac{P(x)}{Q(x)} \right ] = \mathbb{E}_{\mathrm{x} \sim P} [\log P(x) - \log Q(x)]$</p>
+								<li>
+									KL = 0, 当且仅当，P、Q离散同分布或连续"几乎处处"同分布
+								</li>
+								<li>
+									非对称，$D_\text{KL}(P||Q) \ne D_\text{KL}(Q||P)$
+								</li>								
+							</ul>
+						</div>
+						<img src="./imgs/fig3_6.png" height="250">
+					</section>
+
+					<section>
+						<p align="left">交叉熵(cross-entropy)</p>
+						<div align="left">
+							<ul>
+								<li>
+									$H(P, Q) = H(P) + D_\text{KL}(P||Q) = -\mathbb{E}_{\mathrm{x}\sim P} \log Q(x)$
+								</li>
+								<li>
+									对Q最小化交叉熵，等价最小化KL散度
+								</li>								
+							</ul>
+						</div>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>3.14 结构化概率模型</h2>
+					</section>
+
+					<section>
+						<p align="left">结构化概率模型，概率图模型</p>
+						<div align="left">
+							<ul>
+								<li>
+									$p(\mathrm{a}, \mathrm{b}, \mathrm{c}, \mathrm{d}, \mathrm{e}) = p(\mathrm{a}) p(\mathrm{b} \mid \mathrm{a}) p(\mathrm{c} \mid \mathrm{a}, \mathrm{b}) p(\mathrm{d} \mid \mathrm{b}) p(\mathrm{e} \mid \mathrm{c})$
+								</li>
+								<li>
+									利用图表示随机变量之间的关系，顶点，边
+								</li>
+								<li>
+									有向图，已知依赖关系
+								</li>
+							</ul>
+						</div>
+						<img src="./imgs/fig3_7.png" height="250">
+					</section>
+
+					<section>
+						<p align="left">变量间依赖未知</p>
+						<div align="left">
+							<ul>
+								<li>
+									$p(\mathrm{a}, \mathrm{b}, \mathrm{c}, \mathrm{d}, \mathrm{e}) = \frac{1}{Z} \phi^{(1)} (\mathrm{a}, \mathrm{b}, \mathrm{c}) \phi^{(2)}(\mathrm{b}, \mathrm{d}) \phi^{(3)} (\mathrm{c}, \mathrm{e})$
+								</li>
+							</ul>
+						</div>
+						<img src="./imgs/fig3_8.png" height="250">
+					</section>
+
+				</section>			
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					// MathJax
+					{ src: 'plugin/math/math.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>

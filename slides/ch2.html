@@ -1,0 +1,745 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Deep Learning CH2</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				
+				<section>
+					<div style = "height:800px;width:450px;float:left;">
+						<img src="./imgs/dp_back.jpg" />
+					</div>
+					<div>
+						<h2>第二章 线性代数</h2>
+						<ul style="font-size: 30px;">
+							<li>标量、向量、矩阵和张量</li>
+							<li>矩阵和向量相乘</li>
+							<li>单位矩阵和逆矩阵</li>
+							<li>线性相关和生成子空间</li>
+							<li>范数</li>
+							<li>特殊类型的矩阵和向量</li>
+							<li>特征分解</li>
+							<li>奇异值分解</li>
+							<li>Moore-Penrose伪逆</li>
+							<li>迹运算</li>
+							<li>行列式</li>
+							<li>实例：主成分分析</li>
+						</ul>
+					</div>
+				</section>
+
+				<section>
+					<section>
+						<h2>2.1 标量、向量、矩阵和张量</h2>
+					</section>
+					<section>
+						<li>
+							标量（Scalar）：单独的数，斜体表示
+							<p>$\mathit{s} \in \mathbb{R}$, $\mathit{n} \in \mathbb{N}$</p>
+						</li>
+						
+				    	
+				    	<li>
+							向量（Vector）：一维数组, 加粗小写
+							<p>$\boldsymbol{\mathit{x}}\in \mathbb{R}^n$</p>
+						</li>
+						
+						\begin{equation}
+        					\boldsymbol{\mathit{x}}=[{x_1,x_2,\dots,x_n}]^T=
+        					\begin{bmatrix}
+        					x_1   \\  
+                            x_2   \\ 
+                            \vdots \\ 
+                            x_n 
+                			\end{bmatrix}.
+    					\end{equation}
+					</section>
+					<section>
+						<li>矩阵（Matrix）：二维数组, 加粗大写 
+							<p>$\boldsymbol{\mathit{A}}\in \mathbb{R}^{m\times n}$</p>
+						</li>
+						\begin{equation}
+					        \begin{bmatrix}
+					            A_{1,1} & A_{1,2} \\
+					            A_{2,1} & A_{2,2} \\
+					        \end{bmatrix}.
+					    \end{equation}
+					    <li>张量（Tensor）：3维及以上数组 
+							<p>$\textsf{A}_{i,j,k}$</p>
+						</li>
+					</section>
+					<section>
+						<ul>
+							<li>矩阵转置（Transpose）：$\boldsymbol{\mathit{A}}^\top$
+								<p align="center">$(\boldsymbol{\mathit{A}}^\top)_{i,j}= \boldsymbol{\mathit{A}}_{j,i}$</p>
+							</li>
+							<img src="./imgs/fig2_1.png" />
+							<li>
+								标量的转置等于自身：$a = a^\top$
+							</li>
+						</ul>
+					</section>
+					<section>
+						<ul>
+							<li>
+								形状相同的矩阵可相加：$\boldsymbol{\mathit{C}} = \boldsymbol{\mathit{A}} + \boldsymbol{\mathit{B}}$
+								<p align="center">$\boldsymbol{\mathit{C}}_{i,j} = \boldsymbol{\mathit{A}}_{i,j}  + \boldsymbol{\mathit{B}}_{i,j}$</p>
+							</li>
+							<li>
+								标量与矩阵相乘、相加：$\boldsymbol{\mathit{D}} = a\cdot\boldsymbol{\mathit{B}} + c$
+								<p align="center">$\boldsymbol{\mathit{D}}_{i,j} = a\cdot \boldsymbol{\mathit{B}}_{i,j}  + c$</p>
+							</li>
+							<li>
+								向量与矩阵相加：$\boldsymbol{\mathit{C}} = \boldsymbol{\mathit{A}} + \boldsymbol{\mathit{b}}$
+								<p align="center">$\boldsymbol{\mathit{C}}_{i,j} = \boldsymbol{\mathit{A}}_{i,j} + \boldsymbol{\mathit{b}}_j$</p>
+							</li>
+							<img align="center" src="./imgs/broadcasting.png"/>
+						</ul>
+						
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>2.2 矩阵和向量相乘</h2>
+					</section>
+					<section>
+						<ul>
+							<li>
+								$\boldsymbol{\mathit{C}} = \boldsymbol{\mathit{A}}\boldsymbol{\mathit{B}},$
+								$\boldsymbol{\mathit{A}}\in \mathbb{R}^{m*n}, \boldsymbol{\mathit{B}}\in \mathbb{R}^{n*p},\boldsymbol{\mathit{C}}\in \mathbb{R}^{m*p}$
+								<p align="center">$\mathit{C}_{i,j}=\sum_k \mathit{A}_{i,k} \mathit{B}_{k,j}$</p>
+							</li>
+							<li>
+								元素对应乘积（Element-wise product/Hadamard product）:$\boldsymbol{\mathit{A}}\odot \boldsymbol{\mathit{B}}$
+							</li>
+							<li>
+								两向量的点积（Dot product）:$x^\top y$
+							</li>
+							<li>
+								分配率:$\boldsymbol{\mathit{A}}(\boldsymbol{\mathit{B}}+\boldsymbol{\mathit{C}})=\boldsymbol{\mathit{A}}\boldsymbol{\mathit{B}} +\boldsymbol{\mathit{A}}\boldsymbol{\mathit{C}}$
+							</li>
+							<li>
+								结合率:$\boldsymbol{\mathit{A}}(\boldsymbol{\mathit{B}}\boldsymbol{\mathit{C}})=(\boldsymbol{\mathit{A}}\boldsymbol{\mathit{B}})\boldsymbol{\mathit{C}}$
+							</li>
+						</ul>
+						
+					</section>
+					<section>
+						<ul>
+							<li>
+								交换率:
+								<p>矩阵相乘不满足：$\boldsymbol{\mathit{A}}\boldsymbol{\mathit{B}}\neq \boldsymbol{\mathit{B}}\boldsymbol{\mathit{A}}$</p>
+								<p>向量点积满足：$\boldsymbol{\mathit{x}}^\top\boldsymbol{\mathit{y}}=\boldsymbol{\mathit{y}}^\top\boldsymbol{\mathit{x}}$</p>
+							</li>
+							<li>
+								乘积的转置:
+								$(\boldsymbol{\mathit{A}}\boldsymbol{\mathit{B}})^\top=\boldsymbol{\mathit{B}}^\top\boldsymbol{\mathit{A}}^\top$	
+							</li>
+						</ul>
+					</section>
+					<section>
+						<ul>
+							<li>
+								线性方程组:
+								$\boldsymbol{\mathit{A}}\boldsymbol{\mathit{x}}=\boldsymbol{\mathit{b}}$
+								<p align="center">
+								$
+								\boldsymbol{\mathit{A}}_{1,:}\boldsymbol{\mathit{x}}=b_1\\
+								\boldsymbol{\mathit{A}}_{2,:}\boldsymbol{\mathit{x}}=b_2 \\
+								\cdots \\
+								\boldsymbol{\mathit{A}}_{m,:}\boldsymbol{\mathit{x}}=b_m
+								$	
+								</p>
+								<p align="center">
+								$
+								\boldsymbol{\mathit{A}}_{1,1}x_1+\boldsymbol{\mathit{A}}_{1,2}x_2+\cdots \boldsymbol{\mathit{A}}_{1,n}x_n = b_1\\
+							    \boldsymbol{\mathit{A}}_{2,1}x_1+\boldsymbol{\mathit{A}}_{2,2}x_2+\cdots \boldsymbol{\mathit{A}}_{2,n}x_n = b_2\\
+							    \cdots\\
+							    \boldsymbol{\mathit{A}}_{m,1}x_1+\boldsymbol{\mathit{A}}_{m,2}x_2+\cdots \boldsymbol{\mathit{A}}_{m,n}x_n = b_m.
+							    $
+								</p>
+							</li>
+						</ul>
+						
+					</section>	
+				</section>
+
+				<section>
+					<section>
+						<h2>2.3 单位矩阵和逆矩阵</h2>
+					</section>
+					<section>
+						<ul>
+							<li>
+								单位矩阵：$\boldsymbol{\mathit{I}}_{\mathit{n}}\in \mathbb{R}^{\mathit{n}\times \mathit{n}}$
+								<p align="center">
+									$
+									\forall \boldsymbol{\mathit{x}} \in \mathbb{R}^{\mathit{n}}, \boldsymbol{\mathit{I}}_{\mathit{n}} \boldsymbol{\mathit{x}} = \boldsymbol{\mathit{x}}
+									$
+								</p>
+								<img src="./imgs/fig2_2.png" />
+								
+							</li>
+							<li>
+								逆矩阵：矩阵$\boldsymbol{\mathit{A}}$的逆矩阵记作$\boldsymbol{\mathit{A}}^{-1}$，满足：
+								<p align="center"> $\boldsymbol{\mathit{A}}^{-1}\boldsymbol{\mathit{A}} = \boldsymbol{\mathit{I}}_{\mathit{n}}.$</p>
+							</li>
+							
+						</ul>
+						
+					</section>
+					<section>
+						<ul>
+							<li>
+								解线性方程组：$\boldsymbol{\mathit{A}}\boldsymbol{\mathit{x}}=\boldsymbol{\mathit{b}}$
+								<p align="center">
+									\begin{gather}
+									\boldsymbol{\mathit{A}}\boldsymbol{\mathit{x}}=\boldsymbol{\mathit{b}} \\
+									\boldsymbol{\mathit{A}}^{-1}\boldsymbol{\mathit{A}}\boldsymbol{\mathit{x}} = \boldsymbol{\mathit{A}}^{-1}\boldsymbol{\mathit{b}} \\
+									\boldsymbol{\mathit{I}}_{\mathit{n}} \boldsymbol{\mathit{x}}=\boldsymbol{\mathit{A}}^{-1}\boldsymbol{\mathit{b}} \\
+									\boldsymbol{\mathit{x}}=\boldsymbol{\mathit{A}}^{-1}\boldsymbol{\mathit{b}}. 
+									\end{gather}
+								</p>								
+							</li>							
+						</ul>
+						
+					</section>					
+				</section>
+
+				<section>
+					<section>
+						<h2>2.5 范数</h2>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								范数(norm):衡量向量大小的函数,向量x到原点的距离
+							</li>
+							<p>
+								$L^p：\left\lVert{\boldsymbol{\mathit{x}}}\right\rVert_p = \left( \sum_i |x_i|^p \right)^{\frac{1}{p}}$
+								$,p\in \mathbb{R}$，$p\geq 1$
+							</p>
+
+							<p>范数可以是满足以下性质的任意函数：</p>
+							<li>$f(\boldsymbol{\mathit{x}}) = 0 \Rightarrow \boldsymbol{\mathit{x}} = \mathbf{0}$</li> 
+							<li>$f(\boldsymbol{\mathit{x}} + \boldsymbol{\mathit{y}}) \leq f(\boldsymbol{\mathit{x}}) + f(\boldsymbol{\mathit{y}})$</li>
+							<li>$\forall \alpha \in \mathbb{R}$, $f(\alpha \boldsymbol{\mathit{x}}) = |\alpha| f(\boldsymbol{\mathit{x}})$</li>
+						</ul>
+					</section>
+
+					<section>
+						<ul>
+							<li>欧几里德范数,$L^2$：$L^2(x)=\boldsymbol{\mathit{x}}^\top\boldsymbol{\mathit{x}}$</li> 
+							<li>$L^1$：$\left\lVert{\boldsymbol{\mathit{x}}}\right\rVert_1 = \sum_i  |x_i|$</li> 
+							<li>最大范数，$L^\infty$：$\left\lVert{\boldsymbol{\mathit{x}}}\right\rVert_\infty = \max_i |x_i|$</li> 
+							<li>Frobenius范数：衡量矩阵大小</li>
+							$\left\lVert{\boldsymbol{\mathit{A}}}\right\rVert_F = \sqrt{\sum_{i,j} A_{i,j}^2}$
+							<li>点积：$\boldsymbol{\mathit{x}}^\top\boldsymbol{\mathit{y}} = \left\lVert{\boldsymbol{\mathit{x}}}\right\rVert_2\left\lVert{\boldsymbol{\mathit{y}}}\right\rVert_2 \cos \theta$</li>
+						</ul>
+					</section>
+
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>2.6 特殊类型的矩阵和向量</h2>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								对角矩阵（Diagonal Matrix）：矩阵$\boldsymbol{\mathit{D}}$是对角矩阵，当且仅当对于所有的$i\neq j$，$\mathit{D}_{i,j}=0$
+							</li>
+							<li>
+								$\text{diag}(\boldsymbol{\mathit{v}})$表示对角元素由向量$\mathit{v}$给定的对角矩阵
+							</li>
+							<li>
+								$\text{diag}(\boldsymbol{\mathit{v}})\boldsymbol{\mathit{x}}=\boldsymbol{\mathit{v}} \odot \boldsymbol{\mathit{x}}$
+							</li>
+							<li>
+								对角元素非0时，存在逆：$\text{diag}(\boldsymbol{\mathit{v}})^{-1}=\text{diag}([1/v_1,\dots,1/v_n]^\top)$
+							</li>
+							<li>
+								对角矩阵不一定是方阵，非方阵的对角矩阵没有逆矩阵
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								对称矩阵（Symmetric Matrix）：$\boldsymbol{\mathit{A}}=\boldsymbol{\mathit{A}}^\top$
+							</li>
+							<li>
+								单位向量（Unit Vector）：$\left\lVert{\boldsymbol{\mathit{x}}}\right\rVert_2 = 1$
+							</li>
+							<li>
+								正交（Orthogonal）：$\boldsymbol{\mathit{x}}^\top \boldsymbol{\mathit{y}} = 0$
+							</li>
+							<li>
+								标准正交：互为正交的单位向量
+							</li>
+							<li>
+								正交矩阵：$\boldsymbol{\mathit{A}}^\top\boldsymbol{\mathit{A}}=\boldsymbol{\mathit{A}}\boldsymbol{\mathit{A}}^\top=\boldsymbol{\mathit{I}}$
+								<p>$\boldsymbol{\mathit{A}}^{-1}=\boldsymbol{\mathit{A}}^\top$</p>
+							</li>
+						</ul>
+					</section>
+
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>2.7 特征分解</h2>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								矩阵分解，类比整数分解
+							</li>
+							<li>
+								特征分解：将矩阵分解成一组特征向量和特征值
+							</li>
+							<li>
+								非零向量$\mathit{v}$为方阵$\mathit{A}$的特征向量，$\lambda$为对应的特征值
+							</li>
+							<p align="center">$\boldsymbol{\mathit{A}}\boldsymbol{\mathit{v}}=\lambda \boldsymbol{\mathit{v}}$</p>
+							<li>
+								$\mathit{v}$是特征向量，则缩放后的$s\mathit{v}$也是特征向量，通常考虑单位特征向量
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								特征矩阵：$\boldsymbol{\mathit{A}}$的$n$个线性无关的特征向量$\{\boldsymbol{\mathit{v}}^{(1)}, \dots, \boldsymbol{\mathit{v}}^{(n)}\}$构成的矩阵
+								<p align="center">$\boldsymbol{\mathit{V}}=[\boldsymbol{\mathit{v}}^{(1)}, \dots, \boldsymbol{\mathit{v}}^{(n)}]$</p>
+							</li>
+							<li>
+								特征值构成的向量：$\boldsymbol{\lambda} = [\lambda_1, \dots , \lambda_n]^\top$
+							</li>
+							<li>
+								$\boldsymbol{\mathit{A}}$的特征分解
+							</li>
+							<p align="center">$\boldsymbol{\mathit{A}} = \boldsymbol{\mathit{V}} \cdot \text{diag}(\boldsymbol{\lambda}) \cdot \boldsymbol{\mathit{V}}^{-1}$</p>
+							<li>
+								不是所有矩阵都可以特征分解，且有些矩阵的分解会涉及复数
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								实对称矩阵存在实特征向量和实特征值:$\boldsymbol{\mathit{A}} = \boldsymbol{\mathit{Q}} \boldsymbol{\Lambda} \boldsymbol{\mathit{Q}}^\top$.
+							</li>
+							<li>
+								正定矩阵：所有特征值是正数，$\boldsymbol{\mathit{x}}^\top \boldsymbol{\mathit{A}} \boldsymbol{\mathit{x}} =0 \Rightarrow \boldsymbol{\mathit{x}} = \mathbf{0}$.
+							</li>
+							<li>
+								半正定矩阵：所有特征值非负，$\forall \boldsymbol{\mathit{x}}, \boldsymbol{\mathit{x}}^\top \boldsymbol{\mathit{A}} \boldsymbol{\mathit{x}} \geq 0$.
+							</li>
+							<li>
+								负定矩阵：所有特征值是负数.
+							</li>
+							<li>
+								半负定矩阵：所有特征值是非正.
+							</li>
+						</ul>
+					</section>
+
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>2.8 奇异值分解</h2>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								奇异值分解（singular value decomposition，SVD）：将矩阵分解为奇异向量和奇异值
+							</li>
+							<li>
+								每个实矩阵都有奇异分解
+							</li>
+							<li>
+								$\boldsymbol{\mathit{A}}=\boldsymbol{\mathit{U}}\boldsymbol{\mathit{D}}\boldsymbol{\mathit{V}}^\top$
+							</li>
+							<li>
+								$\boldsymbol{\mathit{A}}\in \mathbb{R}^{m*n},\boldsymbol{\mathit{U}}\in \mathbb{R}^{m*m}, \boldsymbol{\mathit{D}}\in \mathbb{R}^{m*n}, \boldsymbol{\mathit{V}}\in \mathbb{R}^{n*n}$
+							</li>
+							<li>
+								$\boldsymbol{\mathit{U}}$和$\boldsymbol{\mathit{V}}$是正交矩阵，$\boldsymbol{\mathit{D}}$是对角矩阵，但不一定是方阵
+							</li>
+							<li>
+								$\boldsymbol{\mathit{D}}$对角线上的值为$\boldsymbol{\mathit{A}}$的奇异值，$\boldsymbol{\mathit{U}}$的列向量为左奇异向量，$\boldsymbol{\mathit{V}}$的列向量为右奇异向量
+							</li>
+						</ul>
+					</section>
+
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>2.9 Moore-Penrose伪逆</h2>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								非方阵的逆没有定义，$\boldsymbol{\mathit{A}}\boldsymbol{\mathit{x}}=\boldsymbol{\mathit{y}}$,$\boldsymbol{\mathit{x}}=\boldsymbol{\mathit{A}}^+ \boldsymbol{\mathit{y}}$
+							</li>
+							<li>
+								矩阵A的Moore-Penrose伪逆：
+							</li>
+							<p align="center">$\boldsymbol{\mathit{A}}^+ = \lim_{\alpha \searrow 0} (\boldsymbol{\mathit{A}}^\top\boldsymbol{\mathit{A}} + \alpha \boldsymbol{\mathit{I}})^{-1} \boldsymbol{\mathit{A}}^\top$</p>
+							<li>
+								计算伪逆的公式：
+							</li>
+							<p align="center">$\boldsymbol{\mathit{A}}^+ = \boldsymbol{\mathit{V}}\boldsymbol{\mathit{D}}^+\boldsymbol{\mathit{U}}^\top$</p>
+							<li>
+								U、D、V是A奇异值分解得到的矩阵
+							</li>
+							<li>
+								对角矩阵$\boldsymbol{\mathit{D}}$的伪逆$\boldsymbol{\mathit{D}}^+$是其非零元素取倒数之后再转置得到的
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								当矩阵A的列数多于行数，线性方程有解，$\boldsymbol{\mathit{x}}=\boldsymbol{\mathit{A}}^+\boldsymbol{\mathit{y}}$是方程所有可行解中欧几里得范数最小的一个
+							</li>
+							<li>
+								当矩阵A的行数多于列数，线性方程可能没有解，$\boldsymbol{\mathit{x}}=\boldsymbol{\mathit{A}}^+\boldsymbol{\mathit{y}}$使得$\boldsymbol{\mathit{A}}\boldsymbol{\mathit{x}}$和$\boldsymbol{\mathit{y}}$的欧几里得距离最小
+							</li>
+						</ul>
+					</section>
+
+				</section>
+
+				<section>
+					<section>
+						<h2>2.10 迹运算</h2>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								$\text{Tr}(\boldsymbol{\mathit{A}})= \sum_i \boldsymbol{\mathit{A}}_{i,i}$
+							</li>
+							<li>
+								$\left\lVert{\boldsymbol{\mathit{A}}}\right\rVert_F = \sqrt{\text{Tr}(\boldsymbol{\mathit{A}} \boldsymbol{\mathit{A}}^\top)}$
+							</li>
+							<li>
+								$\text{Tr}(\boldsymbol{\mathit{A}})=\text{Tr}(\boldsymbol{\mathit{A}}^\top)$
+							</li>
+							<li>
+								$\text{Tr}(\boldsymbol{\mathit{A}}\boldsymbol{\mathit{B}}\boldsymbol{\mathit{C}})=\text{Tr}(\boldsymbol{\mathit{C}}\boldsymbol{\mathit{A}}\boldsymbol{\mathit{B}})= \text{Tr}(\boldsymbol{\mathit{B}}\boldsymbol{\mathit{C}}\boldsymbol{\mathit{A}})$
+							</li>
+							<li>
+								$\text{Tr}(\prod_{i=1}^n \boldsymbol{\mathit{F}}^{(i)})= \text{Tr}(\boldsymbol{\mathit{F}}^{(n)} \prod_{i=1}^{n-1} \boldsymbol{\mathit{F}}^{(i)})$
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								$\boldsymbol{\mathit{A}}\in \mathbb{R}^{m\times n}$，$\boldsymbol{\mathit{B}}\in \mathbb{R}^{n\times m}$
+							</li>
+							<li>
+								$\text{Tr}(\boldsymbol{\mathit{A}}\boldsymbol{\mathit{B}})= \text{Tr}(\boldsymbol{\mathit{B}}\boldsymbol{\mathit{A}})$
+							</li>
+							<li>
+								$a=\text{Tr}(a)$
+							</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>2.11 行列式</h2>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								$\text{det}(\boldsymbol{\mathit{A}})$
+							</li>
+							<li>
+								将方阵映射到实数的函数，等于特征值的乘积
+							</li>							
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>2.12 实例：主成分分析</h2>
+						<li>详见书2.12节</li>
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 30px;">对$\mathbb{R} ^ n$中的点进行有损压缩，以减少存储或传输比特，精度丢失尽可能少</p>
+						<div align="left">
+							<ul>
+								<li>设计一种编码方式，用低维数据表示</li>
+								<li>每个点$\boldsymbol{\mathit{x}}^{(i)} \in \mathbb{R}^n$, 编码成$\boldsymbol{\mathit{c}}^{(i)}\in \mathbb{R}^l$</li>
+								<li>编码函数, $f(\boldsymbol{\mathit{x}})=\boldsymbol{\mathit{c}}$</li>
+								<li>解码函数，$\boldsymbol{\mathit{x}}\approx g(f(\boldsymbol{\mathit{x}}))$</li>
+							</ul>
+						</div>
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 30px;">PCA由选择的解码函数决定</p>
+						<div align="left">
+							<ul>
+								<li>简化解码器，选择矩阵乘法</li>
+								<li>$g(\boldsymbol{\mathit{c}})=\boldsymbol{\mathit{D}}\boldsymbol{\mathit{c}}$</li>
+								<li>$\boldsymbol{\mathit{D}}\in \mathbb{R}^{n\times l}$是解码矩阵</li>
+								<li>限制$\boldsymbol{\mathit{D}}$的列向量有单位范数</li>
+								<li>限制$\boldsymbol{\mathit{D}}$的列向量彼此正交</li>
+							</ul>
+						</div>
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 30px;">寻找$\boldsymbol{\mathit{x}}$的最优编码$\boldsymbol{\mathit{c}}^*$</p>
+						<div align="left" style="font-size: 30px">
+							<ul>
+								<li>最小化原始输入和重构向量的距离</li>
+								<li>$\boldsymbol{\mathit{c}}^* = \underset{\boldsymbol{\mathit{c}}}{\arg\min} \left\lVert{\boldsymbol{\mathit{x}}-g(\boldsymbol{\mathit{c}})}\right\rVert_2^2$</li>
+							</ul>
+						</div>
+						<div align="left" style="font-size: 30px;">
+							<p>
+								$(\boldsymbol{\mathit{x}}-g(\boldsymbol{\mathit{c}}))^\top(\boldsymbol{\mathit{x}}-g(\boldsymbol{\mathit{c}}))$
+							</p>
+							<p>
+								$= \boldsymbol{\mathit{x}}^\top\boldsymbol{\mathit{x}} - \boldsymbol{\mathit{x}}^\top g(\boldsymbol{\mathit{c}}) - g(\boldsymbol{\mathit{c}})^\top\boldsymbol{\mathit{x}} + g(\boldsymbol{\mathit{c}})^\top g(\boldsymbol{\mathit{c}})$, 	(分配率)
+							</p>
+							<p>
+								$= \boldsymbol{\mathit{x}}^\top \boldsymbol{\mathit{x}} - 2\boldsymbol{\mathit{x}}^\top g(\boldsymbol{\mathit{c}}) + g(\boldsymbol{\mathit{c}})^\top g(\boldsymbol{\mathit{c}})$, 	(标量$g(\boldsymbol{\mathit{c}})^\top\boldsymbol{\mathit{x}}$的转置等于自己)
+							</p>
+						</div>						 
+					</section>
+
+					<section>
+						<div align="left" style="font-size: 30px;">
+							<p>
+								$\boldsymbol{\mathit{c}}^* = \underset{\boldsymbol{\mathit{c}}}{\arg\min} - 2\boldsymbol{\mathit{x}}^\top g(\boldsymbol{\mathit{c}}) + g(\boldsymbol{\mathit{c}})^\top g(\boldsymbol{\mathit{c}})$
+							</p>
+							<p>
+								$= \underset{\boldsymbol{\mathit{c}}}{\arg\min} - 2\boldsymbol{\mathit{x}}^\top\boldsymbol{\mathit{D}}\boldsymbol{\mathit{c}} + \boldsymbol{\mathit{c}}^\top\boldsymbol{\mathit{D}}^\top\boldsymbol{\mathit{D}}\boldsymbol{\mathit{c}}$, 	(带入g(c))
+							</p>
+							<p>
+								$ = \underset{\boldsymbol{\mathit{c}}}{\arg\min} -2\boldsymbol{\mathit{x}}^\top\boldsymbol{\mathit{D}}\boldsymbol{\mathit{c}} + \boldsymbol{\mathit{c}}^\top\boldsymbol{\mathit{I}}_l\boldsymbol{\mathit{c}}$, 	(矩阵D的正交性和单位范数约束)
+							</p>
+							<p>
+								$  = \underset{\boldsymbol{\mathit{c}}}{\arg\min} -2\boldsymbol{\mathit{x}}^\top\boldsymbol{\mathit{D}}\boldsymbol{\mathit{c}} + \boldsymbol{\mathit{c}}^\top\boldsymbol{\mathit{c}}$
+							</p>
+						</div>						 
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 30px;">最优化问题，梯度为0</p>
+						<div align="left" style="font-size: 30px;">
+							<p>
+								$ \nabla_{\boldsymbol{\mathit{c}}} (-2\boldsymbol{\mathit{x}}^\top \boldsymbol{\mathit{D}} \boldsymbol{\mathit{c}} + \boldsymbol{\mathit{c}}^\top\boldsymbol{\mathit{c}}) = 0\\
+							    -2\boldsymbol{\mathit{D}}^\top\boldsymbol{\mathit{x}} + 2\boldsymbol{\mathit{c}} = 0\\
+							    \boldsymbol{\mathit{c}} = \boldsymbol{\mathit{D}}^\top \boldsymbol{\mathit{x}}$
+							</p>
+							<p>
+								编码函数：$f(\boldsymbol{\mathit{x}})=\boldsymbol{\mathit{D}}^\top\boldsymbol{\mathit{x}}$
+							</p>
+							<p>
+								PCA重构：$r(\boldsymbol{\mathit{x}})=g(f(\boldsymbol{\mathit{x}})) = \boldsymbol{\mathit{D}}\boldsymbol{\mathit{D}}^\top \boldsymbol{\mathit{x}}$
+							</p>
+						</div>						 
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 30px;">确定矩阵D</p>
+						<div align="left" style="font-size: 30px;">
+							<p>
+								最小化所有点与其重构的误差，误差矩阵的frobenius范数
+							</p>
+							<p>
+								$\boldsymbol{\mathit{D}}^* =  \underset{\boldsymbol{\mathit{D}}}{\arg\min} \sqrt{\sum_{i,j}\left( \boldsymbol{\mathit{x}}_j^{(i)} - r(\boldsymbol{\mathit{x}}^{(i)})_j\right)^2} \text{ subject to } \boldsymbol{\mathit{D}}^\top\boldsymbol{\mathit{D}} = \boldsymbol{\mathit{I}}_l$
+							</p>
+							<p>
+								考虑$l=1$的情况，即降至1维，$\boldsymbol{\mathit{D}}$是一个单一向量$\boldsymbol{\mathit{d}}$
+							</p>
+							<p>
+								$\boldsymbol{\mathit{d}}^* = \underset{\boldsymbol{\mathit{d}}}{\arg\min} \sum_i \left\lVert{\boldsymbol{\mathit{x}}^{(i)} - \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{x}}^{(i)}}\right\rVert_2^2
+    							\text{ subject to } {\left\lVert{\boldsymbol{\mathit{d}}}\right\rVert}_2 = 1$
+							</p>
+							<p>
+								将标量$\boldsymbol{\mathit{d}}^\top\boldsymbol{\mathit{x}}^{(i)}$放在向量$\boldsymbol{\mathit{d}}$的右边
+							</p>
+							<p>
+								$\boldsymbol{\mathit{d}}^* = \underset{\boldsymbol{\mathit{d}}}{\arg\min} \sum_i \left\lVert{\boldsymbol{\mathit{x}}^{(i)} - \boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{x}}^{(i)}\boldsymbol{\mathit{d}}}\right\rVert_2^2
+    							\text{ subject to } {\left\lVert{\boldsymbol{\mathit{d}}}\right\rVert}_2 = 1$
+							</p>
+						</div>						 
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 30px;">使用矩阵简化描述</p>
+						<div align="left" style="font-size: 30px;">
+							<p>
+								编码函数：$c = f(\boldsymbol{\mathit{x}})=\boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}$
+							</p>
+							<p>
+								解码函数：$f(c)=c\boldsymbol{\mathit{d}}^\top$
+							</p>
+							<p>
+								优化问题：
+							</p>
+							<p>
+								$\boldsymbol{\mathit{d}}^* = \underset{\boldsymbol{\mathit{d}}}{\arg\min} \left\lVert{\boldsymbol{\mathit{X}} - \boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top}\right\rVert_F^2 \text{ subject to } \boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{d}} = 1$
+							</p>
+						</div>						 
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 30px;">使用矩阵简化描述</p>
+						<div align="left" style="font-size: 30px;">
+							<p>
+								不考虑约束：$\left\lVert{\boldsymbol{\mathit{A}}}\right\rVert_F = \sqrt{\text{Tr}(\boldsymbol{\mathit{A}} \boldsymbol{\mathit{A}}^\top)}$
+							</p>
+							<p>
+								$\boldsymbol{\mathit{d}}^* = \underset{\boldsymbol{\mathit{d}}}{\arg\min} \left\lVert{\boldsymbol{\mathit{X}} - \boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top}\right\rVert_F^2$
+							</p>
+							<p>
+								$= \underset{\boldsymbol{\mathit{d}}}{\arg\min} \, \text{Tr} \left( \left( \boldsymbol{\mathit{X}} - \boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top  \right)^\top \left( \boldsymbol{\mathit{X}} - \boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top  \right) \right)$
+							</p>
+							<p>
+								$ = \underset{\boldsymbol{\mathit{d}}}{\arg\min} \, \text{Tr} \left( \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} - \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top - \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} + \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top  \right)$
+							</p>
+							<p>
+								$ = \underset{\boldsymbol{\mathit{d}}}{\arg\min} \, \text{Tr}( \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}})  - \text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top)  - \text{Tr}(\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}) + \text{Tr}(\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top)$
+							</p>
+							<p>
+								$= \underset{\boldsymbol{\mathit{d}}}{\arg\min} \, - \text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top)  - \text{Tr}(\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}) + \text{Tr}(\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top)$, (去掉与d无关项)
+							</p>
+						</div>						 
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 30px;">使用矩阵简化描述</p>
+						<div align="left" style="font-size: 30px;">
+							<p>
+								$= \underset{\boldsymbol{\mathit{d}}}{\arg\min} \, - \text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top)  - \text{Tr}(\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}) + \text{Tr}(\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top)$, (去掉与d无关项)
+							</p>
+							<p>
+								$= \underset{\boldsymbol{\mathit{d}}}{\arg\min} \, - 2\text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top) + \text{Tr}(\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top)$, (迹运算循环)
+							</p>
+							<p>
+								$= \underset{\boldsymbol{\mathit{d}}}{\arg\min} \, - 2\text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top) + \text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top )$, (迹运算循环)
+							</p>
+						</div>						 
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 30px;">加入约束条件</p>
+						<div align="left" style="font-size: 30px;">
+							<p>
+								$\underset{\boldsymbol{\mathit{d}}}{\arg\min} \, - 2\text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top) + \text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top )
+    							\text{ subject to } \boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{d}} = 1$
+							</p>
+							<p>
+								$= \underset{\boldsymbol{\mathit{d}}}{\arg\min} \, - 2\text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}} \boldsymbol{\mathit{d}}^\top) + \text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}\boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top )
+    							\text{ subject to } \boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{d}} = 1$, (因为约束条件)
+							</p>
+							<p>
+								$= \underset{\boldsymbol{\mathit{d}}}{\arg\min} \, - \text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top)
+     							\text{ subject to } \boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{d}} = 1$
+							</p>
+							<p>
+								$ = \underset{\boldsymbol{\mathit{d}}}{\arg\max} \, \text{Tr}(\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}}\boldsymbol{\mathit{d}}^\top)
+     							\text{ subject to } \boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{d}} = 1$
+							</p>
+							<p>
+								$= \underset{\boldsymbol{\mathit{d}}}{\arg\max} \, \text{Tr}(\boldsymbol{\mathit{d}}^\top\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}})
+     							\text{ subject to } \boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{d}} = 1$
+							</p>
+						</div>						 
+					</section>
+
+					<section>
+						<p align="left" style="font-size: 30px;">最终优化问题</p>
+						<div align="left" style="font-size: 30px;">
+							<p>
+								$\underset{\boldsymbol{\mathit{d}}}{\arg\max} \, \text{Tr}(\boldsymbol{\mathit{d}}^\top\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}} \boldsymbol{\mathit{d}})
+     							\text{ subject to } \boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{d}} = 1$
+							</p>
+							<p>
+								优化问题可利用特征分解求解，最优的$\boldsymbol{\mathit{d}}$是$\boldsymbol{\mathit{X}}^\top\boldsymbol{\mathit{X}}$最大特征值的特征向量
+							</p>
+							<p>
+								归纳法，l维主成分为最大的l个特征值对应的特征向量
+							</p>
+						</div>						 
+					</section>
+
+				</section>
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					// MathJax
+					{ src: 'plugin/math/math.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>

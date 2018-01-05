@@ -1,0 +1,860 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Deep Learning CH4</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				
+				<section>
+					<div style = "height:800px;width:450px;float:left;">
+						<img src="./imgs/dp_back.jpg" />
+					</div>
+					<div>
+						<h2>第四章 数值计算</h2>
+						<ul style="font-size: 30px;">
+							<li>上溢和下溢</li>
+							<li>病态条件</li>
+							<li>基于梯度的优化方法</li>
+							<li>约束优化</li>
+							<li>实例：线性最小二乘</li>
+						</ul>
+					</div>
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>4.1 上溢和下溢</h2>
+					</section>
+
+					<section style="font-size: 30px;">
+						<ul>
+							
+							<li>
+								下溢(underflow):接近0的数被四舍五入成0
+							</li>
+							<li>
+								上溢(overflow):大数量级的数被近似为$\infty$或$-\infty$
+							</li>
+							<li>
+								例：Softmax函数
+							</li>
+							<p>$\text{softmax}(\boldsymbol{\mathit{x}})_i = \frac{\exp(\mathit{x}_i)}{\sum_{j=1}^n \exp(\mathit{x}_j)}$</p>
+							<li>
+								当所有$\mathit{x}_i$等于常数$\mathit{c}$时，理论上所有输出均为$\frac{1}{n}$
+							</li>
+							<li>
+								若$\mathit{c}$是很小的负数，$\exp(c)$会下溢
+							</li>
+							<li>
+								若$\mathit{c}$是很大的正数，$\exp(c)$会上溢
+							</li>
+							<li>
+								可通过计算$\text{softmax}(\boldsymbol{\mathit{z}})$,$\boldsymbol{\mathit{z}} = \boldsymbol{\mathit{x}} - \max_i \mathit{x}_i$解决
+							</li>
+							<li>
+								计算$\log ~\text{softmax}(\boldsymbol{\mathit{x}})$时，$\text{softmax}$的分子下溢可能导致$\text{softmax}$为0，从而使log为负无穷。要单独实现数值稳定的计算$\log ~\text{softmax}$的方法
+							</li>
+						</ul>
+					</section>
+
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>4.2 病态条件</h2>
+					</section>
+
+					<section style="font-size: 30px;">
+						<img src="./imgs/ch4/fig4_7.png">
+
+						<ul>
+							<li>
+								左方程组的解：$x=2, y=0$
+							</li>
+							<li>
+								右方程组的解：$x=1, y=1$
+							</li>
+							<li>
+								微小扰动对系统有巨大干扰，病态系统
+							</li>
+							<li>
+								参数矩阵$A = 
+						        \begin{bmatrix}
+						            1 & 1 \\
+						            1 & 1.001 \\
+
+						        \end{bmatrix}$
+							</li>
+							<li>
+								$
+						        \begin{bmatrix}
+						            400 & -201 \\
+						            -800 & 401 \\
+
+						        \end{bmatrix}
+						        \begin{bmatrix}
+						            x_1 \\
+						            x_2 \\
+
+						        \end{bmatrix}=
+						        \begin{bmatrix}
+						            200 \\
+						            -200 \\
+
+						        \end{bmatrix}, x_1=-100,x_2=-200
+						        $
+							</li>
+
+							<li>
+								$
+						        \begin{bmatrix}
+						            401 & -201 \\
+						            -800 & 401 \\
+
+						        \end{bmatrix}
+						        \begin{bmatrix}
+						            x_1 \\
+						            x_2 \\
+
+						        \end{bmatrix}=
+						        \begin{bmatrix}
+						            200 \\
+						            -200 \\
+
+						        \end{bmatrix}, x_1=40000,x_2=79800
+						        $
+							</li>
+							<li>
+								参数矩阵是病态的
+							</li>
+						</ul>
+					</section>
+
+					<section style="font-size: 30px;">
+						<ul>
+							<li>
+								矩阵的无穷范数：
+							</li>
+							<img src="./imgs/ch4/infnorm.png" height="150px">
+							<p>
+								$
+						        \begin{bmatrix}
+						            2 & 3 & -7 \\
+						            5 & 4 & -2 \\
+						            7 & -3 & 6 \\
+
+						        \end{bmatrix}
+						        \begin{bmatrix}
+						            x_1 \\
+						            x_2 \\
+						            x_3 \\
+
+						        \end{bmatrix}=
+						        \begin{bmatrix}
+						            3 \\
+						            -7 \\
+						            11 \\
+
+						        \end{bmatrix}
+						        $
+							</p>
+							<p>
+								$
+						        ||b||=max\{3,7,11\}=11
+						        $
+							</p>
+							<p>
+								$
+						        ||A||=max\{12,11,16\}=16
+						        $
+							</p>
+							<p>$||Ax||\le ||A||\cdot ||x||$</p>
+							
+						</ul>
+					</section>
+
+					<section style="font-size: 30px;">
+						<p>$A(x+\Delta x)=b+\Delta b$</p>
+						<p>$Ax+A\Delta x=b+\Delta b$</p>
+						<p>$A\Delta x=\Delta b$</p>
+						<p>$\Delta x=A^{-1}\Delta b$</p>
+						<p>$||\Delta x||=||A^{-1}\Delta b||\le ||A^{-1}||\cdot ||\Delta b||$</p>
+						<p>$||b||=||Ax||\le ||A||\cdot ||x||$</p>
+						<p>$\frac{||\Delta x||}{||A||\cdot ||x||}\le \frac{||A^{-1}||\cdot ||\Delta b||}{||b||}$</p>
+						<p>$\frac{||\Delta x||}{||x||}\le ||A||\cdot ||A^{-1}||\frac{||\Delta b||}{||b||}$</p>
+					</section>
+
+					<section style="font-size: 30px;">
+						<ul>
+							<li>
+								矩阵的条件数：表示矩阵计算时对误差的敏感性，方程组$Ax=b$
+							</li>
+							
+							<p> $cond(A)=||A||\cdot ||A^{-1}||$ </p>
+							<p> $A=
+						        \begin{bmatrix}
+						            400 & -201 \\
+						            -800 & 401 \\
+
+						        \end{bmatrix},A^{-1}=
+						        \begin{bmatrix}
+						            -1.002 & -0.502 \\
+						            -2 & -1 \\
+
+						        \end{bmatrix}
+						    $ </p>
+							<p>$||A||=1201,||A^{-1}||=3,cond(A)=3603$</p>
+							
+						</ul>
+					</section>
+
+					<section style="font-size: 30px;">
+						<ul>
+							<p> $A=
+						        \begin{bmatrix}
+						            1 & -1 \\
+						            1000 & 1000 \\
+
+						        \end{bmatrix},A^{-1}=
+						        \begin{bmatrix}
+						            0.5 & 0.0005 \\
+						            -0.5 & 0.0005\\
+
+						        \end{bmatrix}
+						    $ </p>
+							<p>$||A||=2000,||A^{-1}||=0.5005,cond(A)=1001$</p>
+							<li>
+								缩放，每行除以最大值
+							</li>
+							<p> $A=
+						        \begin{bmatrix}
+						            1 & -1 \\
+						            1 & 1 \\
+
+						        \end{bmatrix},A^{-1}=
+						        \begin{bmatrix}
+						            0.5 & 0.5 \\
+						            -0.5 & 0.5\\
+
+						        \end{bmatrix}
+						    $ </p>
+							<p>$||A||=2,||A^{-1}||=1,cond(A)=2$</p>
+						</ul>
+					</section>
+
+					<section style="font-size: 30px;">
+						<ul>
+							
+							
+							<li>
+								若为2范数：
+
+							</li>
+							<p>$cond(A)=\underset{i,j}{\max}~ \Bigg| \frac{\lambda_i}{ \lambda_j} \Bigg|$</p>
+							<li>
+								条件数很大时，矩阵为病态矩阵，矩阵相乘会放大输入误差
+							</li>
+						</ul>
+					</section>
+
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>4.3 基于梯度的优化方法</h2>
+					</section>
+
+					<section style="font-size: 30px;">
+						<ul>
+							
+							<li>
+								最优化问题，改变x以最小化或最大化函数f(x)
+							</li>
+							<li>
+								目标函数、准则：待最小化、最大化的函数
+							</li>
+							<li>
+								机器学习中，最小化目标函数又称为代价(cost)函数、损失(loss)函数、误差(error)函数
+							</li>
+							<li>
+								考虑无约束优化: $\underset{x}{\min} f(\boldsymbol{\mathit{x}})$
+							</li>
+						</ul>
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<ul >
+								<li>
+									二维空间，一元函数的导数，$f^\prime(x)$， 代表$f(\mathit{x})$在点$x$处的斜率, 自变量增加时，函数的变化趋势
+								</li>
+								<img src="./imgs/ch4/fig4_9.png" height="250px">
+								
+							</ul>
+						</div>
+						
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<ul >
+								<li>
+									三维空间，山坡，$z=f(x,y)$表示点$(x,y)$处山的高度
+								</li>
+
+								<li>
+									$z=f(x,y)$在点$(x,y)$处的偏导数： 
+								</li>
+								<ul>
+									<li>
+										$\frac{\partial z}{\partial x}$,固定y,沿x轴正方向的坡度变化率
+									</li>
+									<li>
+										$\frac{\partial z}{\partial y}$,固定x,沿y轴正方向的坡度变化率
+									</li>
+								</ul>
+
+								<li>
+									偏导数表示函数沿坐标轴方向的变化率
+								</li>
+								<li>
+									函数$f(x,y)$在点(a,b)处的偏导数
+								</li>
+								<p>$\frac{\partial f}{\partial x} (a,b) = \lim_{h\rightarrow 0} \frac{f(a+h,b) - f(a,b)}{h}$</p>
+								<p>$\frac{\partial f}{\partial y} (a,b) = \lim_{h\rightarrow 0} \frac{f(a,b+h) - f(a,b)}{h}$</p>
+							</ul>
+						</div>
+						
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<ul >
+								<li>
+									方向导数，函数$f(x,y)$在点$a=(a_1,a_2)$处沿方向$u$的变化率
+								</li>
+
+								<li>
+									单位方向向量，$u,||u||_2=1$ 
+								</li>
+								<li>
+									$D_{u}f(a) = \lim_{h \to 0} \frac{f(a+hu) - f(a)}{h}$ 
+								</li>
+								<li>
+									$u=(0,1),D_{u}f(a)=\frac{\partial f}{\partial y}(a)$
+								</li>
+								<li>
+									$u=(1,0),D_{u}f(a)=\frac{\partial f}{\partial x}(a)$
+								</li>
+								<li>
+									点$a$处的梯度，偏导数构成的向量，其方向为方向导数最大的方向，模为最大的方向导数
+								</li>
+								<p>$\nabla f = [\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}]^\top$</p>
+								<p>$D_{u}f(a) = \nabla f(a) \cdot u \\
+									= ||\nabla f(a)||\cdot ||u||\cos \theta \\
+									= ||\nabla f(a)||\cos \theta$</p>
+								
+							</ul>
+						</div>
+						
+					</section>
+
+					<section style="font-size: 30px;" >
+						<p>$\underset{x}{\min} f(\boldsymbol{\mathit{x}})$</p>
+						<div align="left">
+							<ul >
+								<li>
+									导数，$f^\prime(x)$，$\frac{dy}{dx}$, 代表$f(\mathit{x})$在点$x$处的斜率
+								</li>
+								<li>
+									$f(\mathit{x}+\epsilon) \approx f(\mathit{x}) + \epsilon f^\prime(\mathit{x}) $
+								</li>
+								<li>
+									$f(\mathit{x}+\epsilon) - f(\mathit{x}) \approx \epsilon f^\prime(\mathit{x}) $
+								</li>
+								<li>
+									$\epsilon f^\prime(\mathit{x}) \le 0$
+								</li>
+								<li>
+									$\Delta x = -\epsilon\text{sign}(f^\prime(\mathit{x})) )$
+								</li>
+								<li>
+									将x向导数相反方向移动
+								</li>
+							</ul>
+						</div>
+						
+					</section>
+
+					<section style="font-size: 30px;" >
+						
+						<div align="left">
+							<ul >
+								<li>
+									$f^\prime(\mathit{x})=0$，x称为临界点(Critical point)、驻点(stationary point)
+								</li>
+								<li>
+									局部最小、局部最大、鞍点
+								</li>
+								<img src="./imgs/ch4/fig4_2.png">
+							</ul>
+						</div>
+						
+					</section>
+
+
+					<section style="font-size: 30px;" >
+						
+						<div align="left">
+							<ul >
+								<li>
+									全局最小点	
+								</li>
+								<img src="./imgs/ch4/fig4_3.png">
+							</ul>
+						</div>						
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<p>梯度下降</p>
+						</div>
+						<div align="left">
+							<ul >
+								<li>
+									偏导数，$\frac{\partial}{\partial \mathit{x}_i}f(\boldsymbol{\mathit{x}})$	
+								</li>
+								<li>
+									梯度，包含所有偏导数的向量，$\nabla_{\boldsymbol{\mathit{x}}} f(\boldsymbol{\mathit{x}})$	
+								</li>
+								<li>
+									一阶泰勒展开，$f(\mathit{x}+\mathit{v}) \approx f(\mathit{x}) + \nabla_ f(x)^\top \mathit{v} $
+								</li>
+								<li>
+									$f(\mathit{x}+\mathit{v}) - f(\mathit{x}) \approx  \nabla_ f(x)^\top \mathit{v} $	
+								</li>
+								<li>
+									寻找下降最快方向, $\mathit{v} = \alpha u, $ $u$为$v$的单位方向向量
+								</li>
+								
+								
+								<p>\begin{align}
+ \underset{\boldsymbol{\mathit{u}}, \boldsymbol{\mathit{u}}^\top\boldsymbol{\mathit{u}} = 1}{\min} \boldsymbol{\mathit{u}}^\top & \nabla_{\boldsymbol{\mathit{x}}} f(\boldsymbol{\mathit{x}}) \\
+ = \underset{\boldsymbol{\mathit{u}}, \boldsymbol{\mathit{u}}^\top\boldsymbol{\mathit{u}} = 1}{\min} \| \boldsymbol{\mathit{u}} \|_2 \| &\nabla_{\boldsymbol{\mathit{x}}}f(\boldsymbol{\mathit{x}}) \|_2 \cos \theta
+\end{align}</p>
+								<li>
+									$ \underset{\boldsymbol{\mathit{u}}}{\min} \cos \theta $, 与梯度方向相反时，下降最快	
+								</li>
+								
+							</ul>
+						</div>						
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<ul >
+								<li>
+									最速下降法（steepest descent）、梯度下降（gradient descent）	
+								</li>
+								<p>$\boldsymbol{\mathit{x}}' = \boldsymbol{\mathit{x}} - \epsilon \nabla_{\boldsymbol{\mathit{x}}} f(\boldsymbol{\mathit{x}})$</p>
+
+								<li>
+									Jacobian矩阵，输入输出都为向量，所有输出对所有输入的偏导数构成的矩阵，Jacobian矩阵
+								</li>
+								<p>$J_{i,j} = \frac{\partial}{\partial \mathit{x}_j} f(\boldsymbol{\mathit{x}})_i$</p>
+							</ul>
+						</div>						
+					</section>
+
+					<section style="font-size: 30px;" >
+						<p align="left">$\boldsymbol{\mathit{x}}' = \boldsymbol{\mathit{x}} - \epsilon \nabla_{\boldsymbol{\mathit{x}}} f(\boldsymbol{\mathit{x}})$</p>
+						<div align="left">
+							<ul >
+								<li>
+									$\epsilon$, 学习速率
+								</li>
+								
+								<li>
+									学习率小，收敛慢；学习率大，可能导致不收敛	
+								</li>
+							</ul>
+						</div>			
+						<img src="./imgs/ch4/fig4_8.png" height="300px">			
+					</section>
+
+					<section style="font-size: 30px;" >
+						<p align="left">二阶导数，曲率</p>
+						<div align="left">
+							<ul >
+								<li>
+									二阶导数为0，直线，沿负梯度方向下降,代价函数减少$\epsilon$
+								</li>
+								
+								<li>
+									二阶导数小于0，沿负梯度方向下降,代价函数减少多于$\epsilon$
+								</li>
+
+								<li>
+									二阶导数大于0，沿负梯度方向下降,代价函数减少少于$\epsilon$
+								</li>
+							</ul>
+						</div>	
+						<img src="./imgs/ch4/fig4_4.png" height="300px">		
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<p>Hessian矩阵</p>
+						</div>
+						<div align="left">
+							<ul >
+								<li>
+									输出对输入向量的二阶导数构成的矩阵，Hessian矩阵	
+								</li>
+								<p>$\boldsymbol{\mathit{H}}(f)(\boldsymbol{\mathit{x}})_{i,j} = \frac{\partial^2}{\partial \mathit{x}_i \partial  \mathit{x}_j} f(\boldsymbol{\mathit{x}})$</p>
+								
+								<li>
+									Hessian矩阵实对称，可特征分解	
+								</li>
+								<li>
+									函数在方向$\boldsymbol{\mathit{d}}$上的二阶导数，$\boldsymbol{\mathit{d}}^\top \boldsymbol{\mathit{H}} \boldsymbol{\mathit{d}}$
+								</li>
+								
+								<li>
+									当$\boldsymbol{\mathit{d}}$是H的特征向量时，二阶导数为对应的特征值。最大特征值为最大二阶导数，最小特征值为最小二阶导数
+								</li>
+							</ul>
+						</div>						
+					</section>
+
+					<section style="font-size: 30px;" >
+						<p align="left">二阶导数，曲率</p>
+						<div align="left">
+							<ul >
+								<li>
+									函数$f(\boldsymbol{\mathit{x}})$在点$\boldsymbol{\mathit{x}}^{(0)}$处的近似二阶泰勒级数
+								</li>
+								<p>$  f(\boldsymbol{\mathit{x}}) \approx f(\boldsymbol{\mathit{x}}^{(0)}) + (\boldsymbol{\mathit{x}} - \boldsymbol{\mathit{x}}^{(0)})^\top \boldsymbol{\mathit{g}} + 
+ \frac{1}{2}  (\boldsymbol{\mathit{x}} - \boldsymbol{\mathit{x}}^{(0)})^\top \boldsymbol{\mathit{H}}  (\boldsymbol{\mathit{x}} - \boldsymbol{\mathit{x}}^{(0)})$</p>
+								<li>
+									以学习率$\epsilon$下降，新点为$\boldsymbol{\mathit{x}}^{(0)}-\epsilon \boldsymbol{\mathit{g}}$	
+								</li>
+								<p>$f(\boldsymbol{\mathit{x}}^{(0)} - \epsilon \boldsymbol{\mathit{g}} ) \approx f(\boldsymbol{\mathit{x}}^{(0)})  - \epsilon \boldsymbol{\mathit{g}}^\top \boldsymbol{\mathit{g}} + \frac{1}{2} \epsilon^2 \boldsymbol{\mathit{g}}^\top \boldsymbol{\mathit{H}}  \boldsymbol{\mathit{g}}$</p>
+								<p>$f(\boldsymbol{\mathit{x}}^{(0)} - \epsilon \boldsymbol{\mathit{g}} ) - f(\boldsymbol{\mathit{x}}^{(0)}) \approx   - \epsilon \boldsymbol{\mathit{g}}^\top \boldsymbol{\mathit{g}} + \frac{1}{2} \epsilon^2 \boldsymbol{\mathit{g}}^\top \boldsymbol{\mathit{H}}  \boldsymbol{\mathit{g}}$</p>
+								
+							</ul>
+						</div>			
+								
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<ul >
+
+								<p>$f(\boldsymbol{\mathit{x}}^{(0)} - \epsilon \boldsymbol{\mathit{g}} ) - f(\boldsymbol{\mathit{x}}^{(0)}) \approx   - \epsilon \boldsymbol{\mathit{g}}^\top \boldsymbol{\mathit{g}} + \frac{1}{2} \epsilon^2 \boldsymbol{\mathit{g}}^\top \boldsymbol{\mathit{H}}  \boldsymbol{\mathit{g}}$</p>
+								
+								<li>
+									当$\boldsymbol{\mathit{g}}^\top \boldsymbol{\mathit{H}}  \boldsymbol{\mathit{g}}$为零或负时，增加$\epsilon$加速下降。但$\epsilon$太大时泰勒级数不准确
+								</li>
+								
+								<li>
+									当$\boldsymbol{\mathit{g}}^\top \boldsymbol{\mathit{H}}  \boldsymbol{\mathit{g}}$为正时，步长选择不合理使得函数增大；使近似泰勒级数下降最多的步长
+								</li>
+								<p>$\epsilon^* = \frac{ \boldsymbol{\mathit{g}}^\top \boldsymbol{\mathit{g}}}{ \boldsymbol{\mathit{g}}^\top \boldsymbol{\mathit{H}}  \boldsymbol{\mathit{g}}}$</p>
+								<li>
+									最坏情况，$\boldsymbol{\mathit{g}}$与$\boldsymbol{\mathit{H}}$的最大特征值对应的特征向量对齐，最优步长为$\frac{1}{\lambda_{\max}}$
+								</li>
+							</ul>
+						</div>			
+								
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<ul >
+								<li>
+									当$f'(x) = 0$且$f''(x) > 0$时，$\boldsymbol{\mathit{x}}$是局部极小点
+								</li>
+								<li>
+									当$f'(x) = 0$且$f''(x) < 0$时，$\boldsymbol{\mathit{x}}$是局部极大点
+								</li>
+								<li>
+									多维情况下，检测Hessian的特征值判断临界点是局部极大、局部极小还是鞍点
+								</li>
+								<li>
+									Hessian正定(所有特征值都为正)，临界点为局部极小点
+								</li>
+								<li>
+									Hessian负定(所有特征值都为负)，临界点为局部极大点
+								</li>
+								<li>
+									Hessian的特征值中至少有一个为正，有一个为负，那么在某个轴上f为局部极大，某个轴上为局部极小
+								</li>
+							</ul>
+
+						</div>
+						<img src="./imgs/ch4/fig4_5.png" height="250px">						
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<ul >
+								<li>
+									Hessian的条件数衡量二阶导数的变化
+								</li>
+								<li>
+									当Hessian的条件数很大时，最大特征值和最小特征值差异大，一个方向上的导数增加快，一个方向上增加慢
+								</li>
+								<li>
+									梯度下降无法包含二阶导数特征，可能使得某个方向增长快，某个方向增长慢
+								</li>
+								<li>
+									为防止最大特征向量方向增长快，需要使步长足够小，步长小会使得其他小曲率方向的进展缓慢
+								</li>
+							</ul>
+
+						</div>
+						<img src="./imgs/ch4/fig4_6.png" height="250px">						
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<p>牛顿法</p>
+						</div>
+						<div align="left">
+							<ul >
+								<li>
+									包含二阶导数信息的搜索方法
+								</li>
+								<p>$f(\boldsymbol{\mathit{x}}) \approx f(\boldsymbol{\mathit{x}}^{(0)}) + (\boldsymbol{\mathit{x}} - \boldsymbol{\mathit{x}}^{(0)})^\top \nabla_{\boldsymbol{\mathit{x}}} f(\boldsymbol{\mathit{x}}^{(0)}) + 
+ \frac{1}{2}  (\boldsymbol{\mathit{x}} - \boldsymbol{\mathit{x}}^{(0)})^\top \boldsymbol{\mathit{H}}(f)(\boldsymbol{\mathit{x}}^{(0)})  (\boldsymbol{\mathit{x}} - \boldsymbol{\mathit{x}}^{(0)})$</p>
+ 								<p>x是临界点，一阶导数为0</p>
+ 								<p>$\nabla f(\boldsymbol{\mathit{x}}) = 0$</p>
+								<li>
+									临界点
+								</li>
+								<p>$\boldsymbol{\mathit{x}}^* =  \boldsymbol{\mathit{x}}^{(0)} -  \boldsymbol{\mathit{H}}(f)(\boldsymbol{\mathit{x}}^{(0)})^{-1}  \nabla_{\boldsymbol{\mathit{x}}} f(\boldsymbol{\mathit{x}}^{(0)})$</p>
+								<li>
+									当f是正定二次函数时，牛顿法只需一步，即可跳到最小点; 若是局部近似正定二次，则需要多次迭代
+								</li>
+								<li>
+									当附近的临界点是最小点时，牛顿法适用，否则会陷入鞍点或最大点
+								</li>
+								<li>
+									一阶优化算法，梯度下降；二阶优化算法，牛顿法
+								</li>
+							</ul>
+
+						</div>						
+					</section>
+
+					<section style="font-size: 30px;" >
+						<div align="left">
+							<p>Lipschitz连续</p>
+						</div>
+						<div align="left">
+							<ul >
+								<p>$ \forall \boldsymbol{\mathit{x}},~\forall \boldsymbol{\mathit{y}}, ~| f(\boldsymbol{\mathit{x}}) - f(\boldsymbol{\mathit{y}})|  \leq \mathcal{L} \| \boldsymbol{\mathit{x}} - \boldsymbol{\mathit{y}} \|_2$</p>
+								<li>
+									深度学习中，限制函数或其导数满足Lipschitz连续
+								</li>
+								<p>$\boldsymbol{\mathit{x}}^* =  \boldsymbol{\mathit{x}}^{(0)} -  \boldsymbol{\mathit{H}}(f)(\boldsymbol{\mathit{x}}^{(0)})^{-1}  \nabla_{\boldsymbol{\mathit{x}}} f(\boldsymbol{\mathit{x}}^{(0)})$</p>
+								<li>
+									梯度下降等算法导致的输入的微小变化使输出产生微小变化
+								</li>
+							</ul>
+
+						</div>						
+					</section>
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>4.4 约束优化</h2>
+					</section>
+
+					<section style="font-size: 30px;">
+						<p>$\underset{x}{\min} f(\boldsymbol{\mathit{x}})$</p>
+						<ul>
+							
+							<li>
+								在$\boldsymbol{\mathit{x}}$的某些集合$\mathbb{S}$中找$f(\boldsymbol{\mathit{x}})$的最大值或最小值
+							</li>
+							<li>
+								集合$\mathbb{S}$内的点称为可行点(feasible)
+							</li>
+							<li>
+								等式约束：$g(x) = 0$
+							</li>
+							<li>
+								不等式约束：$h(x) \le 0$
+							</li>
+						</ul>
+					</section>
+
+					<section style="font-size: 30px;">
+						<div align="left">
+							<p>Karush-Kuhn-Tucker(KKT)方法</p>
+						</div>
+						<div align="left">
+							<ul>
+								<li>
+									广义Lagrangian函数
+								</li>
+								<li>
+									通过$m$个函数$g^{(i)}$和$n$个函数$h^{(j)}$描述$\mathbb{S}$描述集合$\mathbb{S}$
+								</li>
+								<p>$\mathbb{S} = \{ \boldsymbol{\mathit{x}} \mid \forall i, g^{(i)}(\boldsymbol{\mathit{x}}) = 0 ~\text{and}~ \forall j, h^{(j)}(\boldsymbol{\mathit{x}}) \leq 0  \}$</p>
+								<li>
+									$g^{(i)}$为等式约束，$h^{(j)}$为不等式约束
+								</li>
+								<li>
+									KKT乘子，$\lambda_i$和$\alpha_j$
+								</li>
+								<li>
+									定义广义Lagrangian函数
+								</li>
+								<p>$ L(\boldsymbol{\mathit{x}}, \boldsymbol{\lambda}, \boldsymbol{\alpha}) = f(\boldsymbol{\mathit{x}}) + \sum_i \lambda_i g^{(i)}(\boldsymbol{\mathit{x}})  + \sum_j \alpha_j h^{(j)}(\boldsymbol{\mathit{x}})$</p>
+						</ul>
+						</div>
+						
+					</section>
+
+					<section style="font-size: 30px;">
+						<div align="left">
+							<p>Karush-Kuhn-Tucker(KKT)方法</p>
+						</div>
+						<div align="left">
+							<ul>
+								<li>
+									原约束优化问题
+								</li>
+								<p>$\underset{\boldsymbol{\mathit{x}} \in \mathbb{S}}{\min}~ f(\boldsymbol{\mathit{x}})$</p>
+								<li>
+									无约束的广义Langrangian函数优化问题
+								</li>
+								<p>$\underset{\boldsymbol{\mathit{x}}}{\min}~  \underset{\boldsymbol{\lambda}}{\max}~ \underset{\boldsymbol{\alpha}, \boldsymbol{\alpha} \geq 0}{\max}   L(\boldsymbol{\mathit{x}}, \boldsymbol{\lambda}, \boldsymbol{\alpha})$</p>
+								<li>
+									KKT条件,一个点是最优点的必要条件(不充分)
+								</li>
+								<li>
+									广义Lagrangian的梯度为0
+								</li>
+								<li>
+									所有关于x和KKT乘子的约束都满足
+								</li>
+								<li>
+									不等式约束的互补松弛性：$\boldsymbol{\alpha} \odot \boldsymbol{\mathit{h}}(\boldsymbol{\mathit{x}}) = 0$
+								</li>
+							</ul>
+						</div>
+						
+					</section>
+
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>4.5 实例：线性最小二乘</h2>
+					</section>
+
+					<section style="font-size: 30px;">
+						<div align="left">
+							<p>最小化$f(\boldsymbol{\mathit{x}}) = \frac{1}{2}\| \boldsymbol{\mathit{A}} \boldsymbol{\mathit{x}} - \boldsymbol{\mathit{b}} \|_2^2 $</p>
+						</div>
+						<div align="left">
+							<ul>
+								<li>
+									计算梯度：$\nabla_{\boldsymbol{\mathit{x}}} f(\boldsymbol{\mathit{x}}) = \boldsymbol{\mathit{A}}^\top (\boldsymbol{\mathit{A}} \boldsymbol{\mathit{x}} - \boldsymbol{\mathit{b}}) = \boldsymbol{\mathit{A}}^\top \boldsymbol{\mathit{A}} \boldsymbol{\mathit{x}} - \boldsymbol{\mathit{A}}^\top \boldsymbol{\mathit{b}}$
+								</li>
+								<li>
+									梯度下降
+								</li>
+							</ul>
+						</div>
+						<img src="./imgs/ch4/alg4_1.png" height="250px">
+					</section>
+
+					<section style="font-size: 30px;">
+						<div align="left">
+							<p>最小化$f(\boldsymbol{\mathit{x}}) = \frac{1}{2}\| \boldsymbol{\mathit{A}} \boldsymbol{\mathit{x}} - \boldsymbol{\mathit{b}} \|_2^2 $，$\boldsymbol{\mathit{x}}^\top \boldsymbol{\mathit{x}} \leq 1$</p>
+						</div>
+						<div align="left">
+							<ul>
+								<li>
+									广义Lagrangian函数
+								</li>
+								<p>$L(\boldsymbol{\mathit{x}}, \lambda) = f(\boldsymbol{\mathit{x}}) + \lambda (\boldsymbol{\mathit{x}}^\top \boldsymbol{\mathit{x}} - 1)$</p>
+								<li>
+									优化问题
+								</li>
+								<p>$\underset{\boldsymbol{\mathit{x}}}{\min}~
+ \underset{\lambda, \lambda \geq 0}{\max}~ L(\boldsymbol{\mathit{x}}, \lambda)$</p>
+ 								<li>
+									先利用伪逆求解无优化问题，$\boldsymbol{\mathit{x}} = \boldsymbol{\mathit{A}}^+ \boldsymbol{\mathit{b}}$
+								</li>
+								<li>
+									若不是可行解，求Langrangian的梯度为0的点
+								</li>
+								<p>$\boldsymbol{\mathit{A}}^\top \boldsymbol{\mathit{A}} \boldsymbol{\mathit{x}} - \boldsymbol{\mathit{A}}^\top \boldsymbol{\mathit{b}} + 2 \lambda \boldsymbol{\mathit{x}} = 0$</p>
+								<p>$\boldsymbol{\mathit{x}} =  (\boldsymbol{\mathit{A}}^\top \boldsymbol{\mathit{A}} + 2 \lambda \boldsymbol{\mathit{I}} )^{-1} \boldsymbol{\mathit{A}}^\top \boldsymbol{\mathit{b}}$</p>
+								<p>$\frac{\partial}{\partial \lambda} L(\boldsymbol{\mathit{x}}, \lambda)  = \boldsymbol{\mathit{x}}^\top \boldsymbol{\mathit{x}} - 1$</p>
+								
+							</ul>
+						</div>
+					</section>
+
+					
+
+				</section>
+
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					// MathJax
+					{ src: 'plugin/math/math.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>

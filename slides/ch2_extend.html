@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Deep Learning CH2</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+			
+				<section>
+					
+					<section>
+						<h2>矩阵的特征值与特征向量</h2>
+					</section>
+
+					<section>
+						<div align="left">
+							<ul>
+								<li>
+									非零向量$\mathit{v}$为方阵$\mathit{A}$的特征向量，$\lambda$为对应的特征值
+								</li>
+								<p>$\boldsymbol{\mathit{A}}\boldsymbol{\mathit{v}}=\lambda \boldsymbol{\mathit{v}}, \boldsymbol{\mathit{A}}=U\Sigma U^\top$</p>
+								<p>$\boldsymbol{\mathit{A}}\boldsymbol{\mathit{x}}= U\Sigma U^\top \boldsymbol{\mathit{x}}$</p>
+							</ul>
+						</div>
+
+						
+						
+					</section>
+
+					<section>
+						<div align="left" style="font-size: 30px;">
+							\begin{equation}A = 
+						        \begin{bmatrix}
+						            1.5 & 0.5 \\
+						            0.5 & 1.0 \\
+
+						        \end{bmatrix},
+						        x = \text{笑脸}
+						    \end{equation}
+						</div>
+
+						<div align="left" style="font-size: 30px;">
+							$Ax = ?$
+						</div>
+						<img src="./imgs/ch2_ex/fig2ex_1.jpg" height="300px" />
+					</section>
+
+					<section>
+						<p align="left">$\boldsymbol{\mathit{A}}\boldsymbol{\mathit{x}}= U\Sigma U^\top \boldsymbol{\mathit{x}}$</p>
+						<div align="left" style="font-size: 30px;">
+							\begin{equation}A = 
+						        \begin{bmatrix}
+						            1.5 & 0.5 \\
+						            0.5 & 1.0 \\
+
+						        \end{bmatrix},
+						        U = \begin{bmatrix}
+						            0.85 & -0.53 \\
+						            0.53 & 0.85 \\
+
+						        \end{bmatrix},
+						        \Sigma = \begin{bmatrix}
+						            1.81 & 0 \\
+						            0 & 0.69 \\
+
+						        \end{bmatrix},
+						        x = \text{笑脸}
+						    \end{equation}
+						</div>
+						<img src="./imgs/ch2_ex/fig2ex_1.jpg" height="300px" />
+					</section>
+
+					<section>
+						<p align="left">$U^\top \boldsymbol{\mathit{x}}$</p>
+						
+						<img src="./imgs/ch2_ex/fig2ex_2.jpg" height="300px" />
+					</section>
+
+					<section>
+						<p align="left">$\Sigma U^\top \boldsymbol{\mathit{x}}$</p>
+						
+						<img src="./imgs/ch2_ex/fig2ex_3.jpg" height="300px" />
+					</section>
+
+					<section>
+						<p align="left">$U\Sigma U^\top \boldsymbol{\mathit{x}}$</p>
+						
+						<img src="./imgs/ch2_ex/fig2ex_4.jpg" height="300px" />
+					</section>
+
+					<section>
+						<p align="left">$A\boldsymbol{\mathit{x}}$</p>
+						
+						<img src="./imgs/ch2_ex/fig2ex_5.jpg" height="300px" />
+
+						<div align="left"><a href="http://setosa.io/ev/eigenvectors-and-eigenvalues/">more example</a></div>
+					</section>
+
+				</section>
+
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					// MathJax
+					{ src: 'plugin/math/math.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>

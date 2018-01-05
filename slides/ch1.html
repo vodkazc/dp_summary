@@ -1,0 +1,533 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Deep Learning CH1</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				
+				<section>
+					<div style = "height:800px;width:450px;float:left;">
+						<img src="./imgs/dp_back.jpg" />
+					</div>
+					<div>
+						<h2>第一章 引言</h2>
+						<ul>
+							<li>本书面向的读者</li>
+							<li>深度学习的历史趋势</li>
+						</ul>
+					</div>
+				</section>
+
+				<section>
+					<section>
+						<h2>引言</h2>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								人工智能(AI), 创造能自主思考的机器
+							</li>
+							<p align="center"><img src="./imgs/AI.jpg" /> </p>
+						</ul>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								早期AI
+							</li>
+							<li>
+								利用形式化的数学规则描述的问题
+								<ul>
+									<li>计算机很容易完成</li>
+									<li>对人类困难</li>
+								</ul>
+							</li>
+							<li>
+								Deep Blue, IBM, 1997
+								<ul>
+									<li>基于规则的国际象棋系统</li>
+									<li>64个位置，32个棋子，移动规则</li>
+								</ul>
+							</li>
+							<img src="./imgs/Deep_Blue.jpg" width="200" height="250" />
+						</ul>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								早期AI的挑战
+							</li>
+							<li>
+								人类容易执行，很难形式化描述的任务
+								<ul>
+									<li>直觉、经验</li>
+									<li>从经验获取知识（规则）</li>
+								</ul>
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								解决方案1，基于知识的方法
+							</li>
+							<li>
+								知识工程
+								<ul>
+									<li>形式化编码知识</li>
+									<li>建立计算机能读懂的百科全书</li>
+								</ul>
+							</li>
+							<li>
+								Cyc项目
+								<ul>
+									<li>openCyc，CycL语言</li>
+									<li>Concepts: >630k</li>
+									<li>Types of relationships among these concepts: >38k types</li>
+									<li>assertions about these concepts: >7M</li>
+								</ul>
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<img src="./imgs/cyc.png" width="500" height="600" />
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								缺陷：
+							</li>
+							<li>
+								手动添加
+							</li>
+							<li>
+								扩展性差
+							</li>
+							<li>
+								……
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<ul>
+							<li>
+								解决方案2，机器学习
+							</li>
+							<li>
+								使AI系统具备自己获取知识的能力
+							</li>
+							<li>从原始数据提取模式（特征）
+								<ul>
+									<li>性能依赖于原始数据的表示（Representation）</li>
+								</ul>
+							</li>
+							<img src="./imgs/fig1_1.png" width="600" height="400"/>
+						</ul>
+					</section>
+
+					<section>
+						<p>人工提取特征</p>
+						<ul>
+							<li>
+								语音								
+							</li>
+							<img src="./imgs/speech.png" width="350" height="150" />
+
+							<li>
+								图像
+							</li>
+							<img src="./imgs/figure.png" width="350" height="150"/>
+						</ul>
+					</section>
+					<section>
+						<p>特征工程</p>
+						<img src="./imgs/feature.png" width="800" height="550"/>
+					</section>
+
+					<section>
+						<img src="./imgs/rulevsfeature.png"/ height="600">
+						
+					</section>
+					<section>
+						<p style="color: red">机器学习除了学习特征到输出的映射，能否学习原始数据的特征</p>
+					</section>
+
+					<section>
+						<h3>表示学习(Representation Learning)</h3>
+						<div align="left">
+							<ul>
+							<li>
+								学习如何表示原始数据
+							</li>
+							<li>
+								自编码器(Auto-Encoder)
+								<ul>
+									<li>
+										判断原始数据与重构数据是否相似
+									</li>
+								</ul>
+							</li>
+						</ul>
+						</div>
+						
+						<img src="./imgs/ae.png"/ >
+					</section>
+
+					<section>
+						<h3>变化因素(Factor of Variation)</h3>
+						<div align="left">
+							<ul>
+							<li>
+								使物体变化的直接、间接的因素
+							</li>
+							<li>
+								多且错综复杂
+							</li>
+							<li>
+								化繁为简
+							</li>
+						</ul>
+						</div>
+						
+					</section>
+
+					<section>
+						<h3>不恰当的例子</h3>
+						<div align="center">
+							<img src="./imgs/cube1.png"/ >
+						</div>
+						
+					</section>
+
+					<section>
+						<h3>直接法</h3>
+						<div align="center">
+							<img src="./imgs/cube3.jpg"/ >
+						</div>
+						
+					</section>
+
+					<section>
+						<h3>间接法</h3>
+						<div align="center">
+							<img src="./imgs/cube4.png"/ >
+						</div>
+						
+					</section>
+
+					<section>
+						<h2>“由俭入奢”，Layer Based！</h2>
+					</section>
+
+				</section>
+
+				<section>
+					<section>
+						<h3>深度学习(Deep Learning)</h3>
+						<div align="left">
+							<ul>
+							<li>
+								表示学习的一种
+							</li>
+							<li>
+								学习简单特征
+							</li>
+							<li>
+								简单特征刻画复杂特征
+							</li>
+							<li>
+								层次化
+							</li>
+							<li>
+								多层感知器（MLP）
+							</li>
+							
+						</ul>
+						</div>
+					</section>
+
+					<section>
+						<div>
+							<img src="./imgs/fig1_3.png"/ height="600">
+						</div>
+					</section>
+					
+					<section>
+						<div>
+							<img src="./imgs/fig1_4.png"/ height="600">
+						</div>
+					</section>
+
+					<section>
+						<h3>深度学习</h3>
+						<div align="left">
+							<ul>
+							<li>
+								机器学习的一种，一种能够使计算机系统从经验和数据中得到提高的技术
+							</li>
+							<li>
+								具有强大的能力和灵活性，它将大千世界表示为嵌套的层次概念体系
+							</li>
+							<li>
+								由较简单概念间的联系定义复杂概念、从一般抽象概括到高级抽象表示
+							</li>
+						</ul>
+						</div>
+					</section>
+
+					<section>
+						<img src="./imgs/fig1_5.png"/ height="600">
+					</section>
+						
+				</section>
+
+				<section>
+					<section>
+						<h2>1.1 本书面向的读者</h2>
+					</section>
+					
+					<section>
+						<div style = "float:left;">
+							<ul>
+								<li>
+									学生
+								</li>
+								<li>
+									工程师
+								</li>
+								<li>
+									研究者
+								</li>
+							</ul>
+						</div>
+						
+						<div>
+							<img src="./imgs/fig1_6.png"/ height="600">
+						</div>					
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>1.2 深度学习的历史趋势</h2>
+					</section>
+					
+					<section>
+						<h2>第一次浪潮-20世纪40-60年代</h2>
+						<div align="left">
+							<ul>
+								<li>
+									生物学习理论，模拟大脑学习能力
+								</li>
+								<li>
+									控制论（Cybernetics）
+
+								</li>
+								<p>$f(x,w) = x_1w_1+\cdots+x_nw_n$</p>
+								<ul>
+									<li>
+										线性模型
+										<ul>
+											<li>
+												McCulloch-Pitts 神经元（1943）
+											</li>
+											<li>
+												感知机（1956，1958）
+											</li>
+											<li>
+												自适应线性单元（1960）
+											</li>
+										
+										</ul>
+									</li>
+									<li>
+										线性模型局限性
+									</li>
+									<p align="center">无法学习XOR（Minsky，1969）</p>
+								
+								</ul>	
+							</ul>
+						</div>				
+					</section>
+
+					<section>
+						<h2>第二次浪潮-20世纪80-90年代</h2>
+						<div align="left">
+							<ul>
+								<li>
+									联结主义（Connectionism ）
+								</li>
+								<ul>
+									<li>
+										认知科学，网络将大量简单的计算单元连接在一起时可以实现智能行为 
+									</li>
+									<li>
+										分布式表示（distributed representation，Hinton，1986） 
+									</li>
+									<li>
+										反向传播算法 (Rumelhart et al., 1986c; LeCun, 1987)
+									</li>
+								</ul>	
+							</ul>
+						</div>				
+					</section>
+
+					<section>
+						
+						<div>
+							<img src="./imgs/fig1_7.png"/ height="500">
+						<div>
+
+										
+					</section>
+
+					<section>
+						
+						<div>
+							<img src="./imgs/fig1_8.png"/ height="500">
+						<div>				
+					</section>
+
+					<section>
+						<p align="left">退潮</p>
+						<div align="left">
+							<ul>
+								<li>
+									计算资源受限
+								</li>
+								<li>
+									其他统计学习方法，SVM、核方法、图模型有很好的效果
+								</li>
+							</ul>
+						<div>				
+					</section>
+
+					<section>
+						<h2>第三次浪潮-2006-至今</h2>
+						<div align="left">
+							<ul>
+								<li>
+									2006，DL元年（Connectionism ）
+								</li>
+								<ul>
+									<li>
+										Hinton，Science Paper，无监督预训练对权值进行初始化+有监督训练微调 
+									</li>
+								</ul>
+								<li>
+									2011，ReLU激活函数被提出，有效抑制梯度消失问题
+								</li>
+								<li>
+									2011，微软首次将DL应用在语音识别上，取得了重大突破
+								</li>	
+							</ul>
+						</div>				
+					</section>
+
+					<section>
+						<h2>爆发期</h2>
+						<div align="left">
+							<ul>
+								<li>
+									2012，Hinton，ImageNet图像识别比赛
+								</li>
+								<ul>
+									<li>
+										基于CNN的AlexNet夺得冠军，前5错误率从 26.1% 降到 15.3%（2015年，已降至3.6%） 
+									</li>
+									<li>
+										碾压第二名，基于SVM的分类方法
+									</li>
+									<li>
+										AlexNet，ReLU激活函数，Dropout，GPU加速，……
+									</li>
+								</ul>
+								<li>
+									2015， DeepResidualNet，高效训练150层网络
+								</li>
+								<li>
+									2012-至今，图像识别、语音识别、自然语言处理的成功应用
+								</li>	
+							</ul>
+						</div>				
+					</section>
+
+					<section>
+						<h2>发展迅速的原因</h2>
+						<div align="left">
+							<ul>
+								<li>
+									数据量增大，训练数据更好获得
+								</li>
+								<li>
+									模型规模增大，得益于快速计算资源
+								</li>
+								<li>
+									应用场景广泛
+								</li>
+								<li>
+									……
+								</li>	
+							</ul>
+						</div>				
+					</section>
+
+				</section>
+
+				<section>
+						<img src="./imgs/dl_frame.png"/ height="500">				
+				</section>
+
+				</section>
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					// MathJax
+					{ src: 'plugin/math/math.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>
